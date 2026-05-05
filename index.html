@@ -21,7 +21,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
   body { background: var(--ag-bg); min-height: 100vh; }
 
-  /* ── HEADER ── */
   .header { background: var(--ag-dark); color: #fff; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
   .header-left { display: flex; align-items: center; gap: 14px; }
   .logo-ring { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid var(--ag-lichtblauw); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -32,18 +31,17 @@
   .sync-status { font-size: 11px; opacity: 0.7; display: flex; align-items: center; gap: 5px; }
   .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ag-lichtblauw); flex-shrink: 0; }
   .sync-dot.syncing { background: #f6c26c; animation: pulse 1s infinite; }
-  .sync-dot.ok      { background: var(--ag-groen); }
-  .sync-dot.err     { background: var(--ag-roze); }
+  .sync-dot.ok  { background: var(--ag-groen); }
+  .sync-dot.err { background: var(--ag-roze); }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
   .hbtn { padding: 6px 14px; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
-  .hbtn-green { background: var(--ag-groen); color: #fff; }
+  .hbtn-green   { background: var(--ag-groen); color: #fff; }
   .hbtn-green:hover { background: var(--ag-donkergroen); }
   .hbtn-outline { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
   .hbtn-outline:hover { background: rgba(255,255,255,0.2); }
 
-  /* ── TOKEN MODAL ── */
   .modal-bg { position: fixed; inset: 0; background: rgba(17,54,66,0.55); display: flex; align-items: center; justify-content: center; z-index: 999; }
-  .modal { background: #fff; border-radius: 14px; padding: 28px; width: 440px; max-width: 95vw; box-shadow: 0 8px 32px rgba(17,54,66,0.18); }
+  .modal { background: #fff; border-radius: 14px; padding: 28px; width: 440px; max-width: 95vw; }
   .modal h2 { font-size: 16px; font-weight: 600; color: var(--ag-dark); margin-bottom: 6px; }
   .modal p  { font-size: 12px; color: var(--ag-muted); margin-bottom: 16px; line-height: 1.6; }
   .modal input { width: 100%; border: 1.5px solid var(--ag-border); border-radius: 8px; padding: 9px 12px; font-size: 13px; color: var(--ag-dark); font-family: monospace; margin-bottom: 12px; }
@@ -52,7 +50,6 @@
   .modal-note { font-size: 11px; color: var(--ag-muted); margin-top: 10px; }
   .modal-err  { font-size: 11px; color: #c0392b; margin-top: 8px; display: none; }
 
-  /* ── FILTERS ── */
   .filters { background: #fff; border-bottom: 1.5px solid var(--ag-border); padding: 10px 28px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
   .filter-sep { width: 1px; height: 26px; background: var(--ag-border); flex-shrink: 0; }
   .filter-label { font-size: 10px; font-weight: 700; color: var(--ag-dark); text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap; margin-right: 6px; }
@@ -60,16 +57,15 @@
   .tab-group { display: flex; gap: 4px; flex-wrap: wrap; }
   .tab-btn { padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--ag-border); background: transparent; font-size: 12px; font-weight: 500; color: var(--ag-dark); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
   .tab-btn:hover { background: rgba(17,54,66,0.07); }
-  .tab-btn.active      { background: var(--ag-dark); color: #fff; border-color: var(--ag-dark); }
-  .tab-btn.rn.active   { background: #1a6e7a; border-color: #1a6e7a; }
-  .tab-btn.rm.active   { background: var(--ag-donkergroen); border-color: var(--ag-donkergroen); }
-  .tab-btn.rz.active   { background: #a05050; border-color: #a05050; }
+  .tab-btn.active    { background: var(--ag-dark); color: #fff; border-color: var(--ag-dark); }
+  .tab-btn.rn.active { background: #1a6e7a; border-color: #1a6e7a; }
+  .tab-btn.rm.active { background: var(--ag-donkergroen); border-color: var(--ag-donkergroen); }
+  .tab-btn.rz.active { background: #a05050; border-color: #a05050; }
   .week-wrap { display: flex; align-items: center; gap: 10px; }
   .week-label { font-size: 12px; font-weight: 600; color: var(--ag-dark); min-width: 78px; }
   input[type=range] { accent-color: var(--ag-groen); width: 130px; }
   select { border: 1.5px solid var(--ag-border); border-radius: 7px; padding: 5px 10px; font-size: 12px; color: var(--ag-dark); background: var(--ag-bg); font-family: inherit; cursor: pointer; }
 
-  /* ── BODY ── */
   .body { padding: 20px 28px; display: flex; flex-direction: column; gap: 18px; }
   .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
   .kpi-card { background: var(--ag-card); border: 1px solid var(--ag-border); border-radius: 12px; padding: 16px 18px; position: relative; overflow: hidden; }
@@ -90,7 +86,7 @@
   .add-btn { padding: 5px 13px; background: var(--ag-dark); color: #fff; border: none; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
   .add-btn:hover { background: var(--ag-donkergroen); }
   .add-form { background: var(--ag-bg); border-radius: 8px; padding: 12px; margin-bottom: 12px; display: none; }
-  .fg { display: grid; grid-template-columns: repeat(6,1fr) auto; gap: 8px; align-items: end; }
+  .fg { display: grid; grid-template-columns: repeat(7,1fr) auto; gap: 8px; align-items: end; }
   .fg label { font-size: 10px; font-weight: 700; color: var(--ag-muted); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
   .fg input, .fg select { width:100%; border:1.5px solid var(--ag-border); border-radius:7px; padding:6px 8px; font-size:12px; color:var(--ag-dark); background:#fff; font-family:inherit; }
   .fg input:focus, .fg select:focus { outline:2px solid var(--ag-lichtblauw); border-color:transparent; }
@@ -98,7 +94,7 @@
   .save-note { font-size:11px; color:var(--ag-groen); font-weight:600; margin-top:6px; display:none; }
 
   table { width:100%; border-collapse:collapse; font-size:12px; }
-  th { text-align:left; font-size:10px; font-weight:700; color:var(--ag-muted); text-transform:uppercase; letter-spacing:0.5px; padding:0 7px 8px; border-bottom:1.5px solid var(--ag-border); }
+  th { text-align:left; font-size:10px; font-weight:700; color:var(--ag-muted); text-transform:uppercase; letter-spacing:0.5px; padding:0 7px 8px; border-bottom:1.5px solid var(--ag-border); white-space:nowrap; }
   td { padding:7px; border-bottom:0.5px solid var(--ag-border); color:var(--ag-dark); vertical-align:middle; }
   tr:last-child td { border-bottom:none; }
   td input[type=number] { width:48px; border:1.5px solid var(--ag-border); border-radius:6px; padding:3px 5px; font-size:12px; color:var(--ag-dark); background:var(--ag-bg); font-family:inherit; }
@@ -112,6 +108,7 @@
   .tr-noord  { background:rgba(26,110,122,0.12);  color:#1a6e7a; }
   .tr-midden { background:rgba(0,112,89,0.12);    color:var(--ag-donkergroen); }
   .tr-zuid   { background:rgba(160,80,80,0.12);   color:#a05050; }
+  .ts-badge  { background:rgba(17,54,66,0.07); color:var(--ag-dark); padding:2px 7px; border-radius:8px; font-size:10px; font-weight:700; }
 
   .del-btn { background:none; border:none; cursor:pointer; color:var(--ag-muted); font-size:14px; padding:2px 4px; border-radius:4px; }
   .del-btn:hover { color:#c0392b; background:rgba(192,57,43,0.08); }
@@ -133,28 +130,25 @@
   .chart-wrap { position:relative; width:100%; height:210px; }
   .empty-row  { text-align:center; color:var(--ag-muted); padding:20px; font-size:12px; }
 
-  /* loading overlay */
   #loadOverlay { position:fixed; inset:0; background:var(--ag-dark); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; color:#fff; gap:14px; }
   #loadOverlay .spin { width:32px; height:32px; border:3px solid rgba(158,212,216,0.3); border-top-color:var(--ag-lichtblauw); border-radius:50%; animation:spin 0.8s linear infinite; }
   #loadOverlay p { font-size:13px; opacity:0.7; }
   @keyframes spin { to { transform:rotate(360deg); } }
 
-  @media (max-width:1000px) {
+  @media (max-width:1100px) {
     .kpi-row { grid-template-columns:repeat(2,1fr); }
     .row2, .row3 { grid-template-columns:1fr; }
-    .fg { grid-template-columns:1fr 1fr 1fr; }
+    .fg { grid-template-columns:1fr 1fr 1fr 1fr; }
   }
 </style>
 </head>
 <body>
 
-<!-- Loading overlay -->
 <div id="loadOverlay">
   <div class="spin"></div>
   <p>Dashboard laden...</p>
 </div>
 
-<!-- Token modal -->
 <div class="modal-bg" id="tokenModal" style="display:none;">
   <div class="modal">
     <h2>GitHub koppelen</h2>
@@ -164,12 +158,11 @@
       <button class="hbtn hbtn-outline" style="color:var(--ag-dark);border-color:var(--ag-border);background:transparent;" onclick="closeTokenModal()">Annuleer</button>
       <button class="hbtn hbtn-green" onclick="saveToken()">Opslaan &amp; verbinden</button>
     </div>
-    <div class="modal-err" id="tokenErr">Token ongeldig of geen toegang tot de repo. Controleer de scope (repo).</div>
+    <div class="modal-err" id="tokenErr">Token ongeldig of geen toegang tot de repo.</div>
     <div class="modal-note">Aanmaken via <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--ag-donkergroen);">github.com/settings/tokens</a> — scope: <code>repo</code></div>
   </div>
 </div>
 
-<!-- Header -->
 <div class="header">
   <div class="header-left">
     <div class="logo-ring"><div class="logo-inner"></div></div>
@@ -189,7 +182,6 @@
   </div>
 </div>
 
-<!-- Filters -->
 <div class="filters">
   <div class="filter-group">
     <span class="filter-label">Recruiter</span>
@@ -219,20 +211,29 @@
       <span class="week-label" id="weekDisplay">Alle weken</span>
     </div>
   </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <span class="filter-label">Sessie</span>
+    <div class="tab-group" id="sessieTabs">
+      <button class="tab-btn active" onclick="setF('sessie','all',this,'sessieTabs')">Alle</button>
+      <button class="tab-btn" onclick="setF('sessie','1',this,'sessieTabs')">S1</button>
+      <button class="tab-btn" onclick="setF('sessie','2',this,'sessieTabs')">S2</button>
+      <button class="tab-btn" onclick="setF('sessie','3',this,'sessieTabs')">S3</button>
+    </div>
+  </div>
   <div class="filter-group" style="margin-left:auto;">
-    <select id="sprintFilter" onchange="renderAll()">
-      <option value="all">Alle sprints</option>
+    <select id="weekFilter" onchange="renderAll()">
+      <option value="all">Alle weken</option>
     </select>
   </div>
 </div>
 
-<!-- Body -->
 <div class="body">
   <div class="kpi-row">
     <div class="kpi-card c-dark">
       <div class="kpi-label">Berichten verstuurd</div>
       <div class="kpi-val" id="kpi-sent">0</div>
-      <div class="kpi-sub" id="kpi-sent-sub">— sprints</div>
+      <div class="kpi-sub" id="kpi-sent-sub">— rijen</div>
     </div>
     <div class="kpi-card c-green">
       <div class="kpi-label">Reacties ontvangen</div>
@@ -245,9 +246,9 @@
       <div class="kpi-sub" id="kpi-pos-pct">— van reacties</div>
     </div>
     <div class="kpi-card c-pink">
-      <div class="kpi-label">Gem. per sprint</div>
+      <div class="kpi-label">Gem. per sessie</div>
       <div class="kpi-val" id="kpi-avg">0</div>
-      <div class="kpi-sub">berichten / sessie</div>
+      <div class="kpi-sub" id="kpi-avg-sub">berichten / sessie</div>
     </div>
   </div>
 
@@ -260,15 +261,14 @@
       <div class="add-form" id="addFormWrap">
         <div class="fg">
           <div><label>Week</label><select id="f-week"></select></div>
+          <div><label>Sessie</label>
+            <select id="f-sessie"><option value="1">Sessie 1</option><option value="2">Sessie 2</option><option value="3">Sessie 3</option></select>
+          </div>
           <div><label>Recruiter</label>
-            <select id="f-recruiter">
-              <option>Beaudine</option><option>Patrick</option><option>Marc</option><option>Devlin</option>
-            </select>
+            <select id="f-recruiter"><option>Beaudine</option><option>Patrick</option><option>Marc</option><option>Devlin</option></select>
           </div>
           <div><label>Niveau</label>
-            <select id="f-niveau">
-              <option>Junior</option><option>Medior</option><option>Senior</option><option>Werkondernemer</option>
-            </select>
+            <select id="f-niveau"><option>Junior</option><option>Medior</option><option>Senior</option><option>Werkondernemer</option></select>
           </div>
           <div><label>Regio</label>
             <select id="f-regio"><option>Noord</option><option>Midden</option><option>Zuid</option></select>
@@ -276,7 +276,7 @@
           <div><label>Verstuurd</label><input type="number" id="f-verstuurd" placeholder="0" min="0" step="1"></div>
           <div><label>Reacties</label><input type="number" id="f-reacties" placeholder="0" min="0" step="1"></div>
           <div class="fa">
-            <button class="add-btn" onclick="addSprint()">Opslaan</button>
+            <button class="add-btn" onclick="addSprint()">OK</button>
             <button class="add-btn" style="background:var(--ag-muted);" onclick="toggleForm()">✕</button>
           </div>
         </div>
@@ -285,7 +285,7 @@
       <table>
         <thead>
           <tr>
-            <th>Week</th><th>Recruiter</th><th>Niveau</th><th>Regio</th><th>Verstuurd</th><th>React. / Pos.</th><th>%</th><th></th>
+            <th>Week</th><th>Sessie</th><th>Recruiter</th><th>Niveau</th><th>Regio</th><th>Verstuurd</th><th>React. / Pos.</th><th>%</th><th></th>
           </tr>
         </thead>
         <tbody id="sprintBody"></tbody>
@@ -308,7 +308,7 @@
       <div class="bar-list" id="recruiterBars"></div>
     </div>
     <div class="card">
-      <div class="card-title">Trend per week</div>
+      <div class="card-title">Trend per week (totaal verstuurd)</div>
       <div class="chart-wrap">
         <canvas id="trendChart" role="img" aria-label="Lijndiagram berichten per week per recruiter">Berichten per week.</canvas>
       </div>
@@ -317,13 +317,11 @@
 </div>
 
 <script>
-/* ── CONFIG ── */
 const OWNER = 'devlindebruin-creator';
 const REPO  = 'linkedinsprintsessie';
 const FILE  = 'data.json';
 const API   = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
 
-/* ── LOOKUPS ── */
 const RECRUITERS  = ['Beaudine','Patrick','Marc','Devlin'];
 const NIVEAUS     = ['Junior','Medior','Senior','Werkondernemer'];
 const REGIOS      = ['Noord','Midden','Zuid'];
@@ -333,16 +331,14 @@ const NIVEAU_COLS = ['#9ED4D8','#43B08C','#113642','#F6C6C6'];
 const REGIO_COLS  = ['#1a6e7a','#007059','#a05050'];
 const REC_COLS    = ['#113642','#43B08C','#9ED4D8','#007059'];
 
-/* ── STATE ── */
-let sprints   = [];
-let fileSHA   = null;
-let nextId    = 1;
-let af        = { recruiter:'all', regio:'all' };
+let sprints    = [];
+let fileSHA    = null;
+let nextId     = 1;
+let af         = { recruiter:'all', regio:'all', sessie:'all' };
 let activeWeek = 'all';
 let trendChart = null;
 let saveTimer  = null;
 
-/* ── TOKEN ── */
 function getToken() { return localStorage.getItem('ag_gh_token') || ''; }
 function setToken(t) { localStorage.setItem('ag_gh_token', t); }
 
@@ -358,29 +354,22 @@ async function saveToken() {
   setSyncState('syncing','Token testen...');
   try {
     const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, { headers: authHeaders(t) });
-    if (!r.ok) throw new Error('no access');
-    setToken(t);
-    closeTokenModal();
-    await loadFromGitHub();
+    if (!r.ok) throw new Error();
+    setToken(t); closeTokenModal(); await loadFromGitHub();
   } catch {
     document.getElementById('tokenErr').style.display = 'block';
     setSyncState('err','Token onjuist');
   }
 }
 
-/* ── SYNC UI ── */
 function setSyncState(state, text) {
-  const dot  = document.getElementById('syncDot');
-  const span = document.getElementById('syncText');
-  dot.className = 'sync-dot ' + state;
-  span.textContent = text;
+  document.getElementById('syncDot').className = 'sync-dot ' + state;
+  document.getElementById('syncText').textContent = text;
 }
-
 function authHeaders(token) {
-  return { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' };
+  return { 'Authorization':'token '+token, 'Content-Type':'application/json', 'Accept':'application/vnd.github.v3+json' };
 }
 
-/* ── GITHUB LOAD ── */
 async function loadFromGitHub() {
   const token = getToken();
   if (!token) { setSyncState('err','Geen token'); document.getElementById('loadOverlay').style.display='none'; openTokenModal(); return; }
@@ -388,77 +377,77 @@ async function loadFromGitHub() {
   try {
     const r = await fetch(API, { headers: authHeaders(token) });
     if (r.status === 404) {
-      // File bestaat nog niet — lege dataset, we maken hem aan bij eerste save
-      sprints = [];
-      fileSHA = null;
-      nextId  = 1;
-      setSyncState('ok', 'Nieuw bestand — sla op om te starten');
+      sprints=[]; fileSHA=null; nextId=1;
+      setSyncState('ok','Nieuw bestand — sla op om te starten');
     } else if (!r.ok) {
       throw new Error('fetch failed');
     } else {
       const json = await r.json();
       fileSHA = json.sha;
-      const decoded = JSON.parse(atob(json.content.replace(/\n/g,'')));
-      sprints = decoded.sprints || [];
-      nextId  = decoded.nextId  || (sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1);
-      setSyncState('ok', 'Gesynchroniseerd');
+      const d = JSON.parse(atob(json.content.replace(/\n/g,'')));
+      sprints = d.sprints || [];
+      nextId  = d.nextId  || (sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1);
+      // Migrate old records without sessie field
+      sprints.forEach(s => { if (!s.sessie) s.sessie = '1'; });
+      setSyncState('ok','Gesynchroniseerd');
     }
-  } catch(e) {
-    setSyncState('err', 'Laden mislukt');
-    // fallback: localStorage
-    const local = localStorage.getItem('ag_li_v3');
-    if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; } catch{} }
+  } catch {
+    setSyncState('err','Laden mislukt');
+    const local = localStorage.getItem('ag_li_v4');
+    if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; sprints.forEach(s=>{if(!s.sessie)s.sessie='1';}); } catch{} }
   }
-  document.getElementById('loadOverlay').style.display = 'none';
-  syncSlider(); syncSprintFilter(); renderAll();
+  document.getElementById('loadOverlay').style.display='none';
+  syncSlider(); syncWeekFilter(); renderAll();
 }
 
-/* ── GITHUB SAVE ── */
 async function saveToGitHub() {
   const token = getToken();
-  if (!token) { setSyncState('err','Geen token — klik Token om in te stellen'); return; }
+  if (!token) { setSyncState('err','Geen token'); return; }
   setSyncState('syncing','Opslaan...');
   const payload = { sprints, nextId };
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-  const body = { message: 'Dashboard update ' + new Date().toISOString(), content };
+  const body = { message:'Dashboard update '+new Date().toISOString(), content };
   if (fileSHA) body.sha = fileSHA;
   try {
-    const r = await fetch(API, { method:'PUT', headers: authHeaders(token), body: JSON.stringify(body) });
-    if (!r.ok) { const e=await r.json(); throw new Error(e.message||'save failed'); }
+    const r = await fetch(API, { method:'PUT', headers:authHeaders(token), body:JSON.stringify(body) });
+    if (!r.ok) { const e=await r.json(); throw new Error(e.message); }
     const j = await r.json();
     fileSHA = j.content.sha;
-    // also cache locally
-    localStorage.setItem('ag_li_v3', JSON.stringify(payload));
-    setSyncState('ok', 'Opgeslagen ' + new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}));
+    localStorage.setItem('ag_li_v4', JSON.stringify(payload));
+    setSyncState('ok','Opgeslagen '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}));
   } catch(e) {
-    setSyncState('err', 'Opslaan mislukt: ' + e.message);
+    setSyncState('err','Opslaan mislukt: '+e.message);
   }
 }
+function scheduleSave() { clearTimeout(saveTimer); saveTimer=setTimeout(saveToGitHub,1500); }
+function manualSave()   { clearTimeout(saveTimer); saveToGitHub(); }
 
-function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveToGitHub, 1500);
+/* ── WEEKS ── */
+function sortWeeks(arr) { return arr.sort((a,b)=>parseInt(a.replace('Week ',''))-parseInt(b.replace('Week ',''))); }
+function allWeeks()     { return sortWeeks([...new Set(sprints.map(s=>s.week))]); }
+
+/* ── UNIQUE SESSIONS ──
+   Een "sessie" = unieke combinatie van week + sessienummer.
+   Gemiddelde = totaal berichten / aantal unieke sessies. */
+function uniqueSessions(fs) {
+  const keys = new Set(fs.map(s => s.week + '|' + s.sessie));
+  return keys.size;
 }
 
-function manualSave() { clearTimeout(saveTimer); saveToGitHub(); }
-
-/* ── DATA HELPERS ── */
-function sortWeeks(arr) { return arr.sort((a,b)=>parseInt(a.replace('Week ',''))-parseInt(b.replace('Week ',''))); }
-function allWeeks() { return sortWeeks([...new Set(sprints.map(s=>s.week))]); }
-
+/* ── FILTER ── */
 function filtered() {
   return sprints.filter(s => {
     if (af.recruiter!=='all' && s.recruiter!==af.recruiter) return false;
-    if (af.regio!=='all' && s.regio!==af.regio) return false;
-    if (activeWeek!=='all' && s.week!==activeWeek) return false;
-    const sf = document.getElementById('sprintFilter').value;
-    if (sf!=='all' && s.week!==sf) return false;
+    if (af.regio!=='all'     && s.regio!==af.regio)         return false;
+    if (af.sessie!=='all'    && s.sessie!==af.sessie)        return false;
+    if (activeWeek!=='all'   && s.week!==activeWeek)         return false;
+    const wf = document.getElementById('weekFilter').value;
+    if (wf!=='all' && s.week!==wf) return false;
     return true;
   });
 }
 
-/* ── FILTER CONTROLS ── */
-function setF(type, val, el, tabId) {
+function setF(type,val,el,tabId) {
   af[type]=val;
   document.querySelectorAll('#'+tabId+' .tab-btn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
@@ -478,9 +467,9 @@ function syncSlider() {
   if(activeWeek!=='all'){ const i=weeks.indexOf(activeWeek); slider.value=i>=0?i+1:0; if(i<0){activeWeek='all';document.getElementById('weekDisplay').textContent='Alle weken';slider.value=0;} }
 }
 
-function syncSprintFilter() {
-  const sel=document.getElementById('sprintFilter'), cur=sel.value, weeks=allWeeks();
-  sel.innerHTML='<option value="all">Alle sprints</option>'+weeks.map(w=>`<option value="${w}">${w}</option>`).join('');
+function syncWeekFilter() {
+  const sel=document.getElementById('weekFilter'), cur=sel.value, weeks=allWeeks();
+  sel.innerHTML='<option value="all">Alle weken</option>'+weeks.map(w=>`<option value="${w}">${w}</option>`).join('');
   if(weeks.includes(cur)) sel.value=cur;
 }
 
@@ -495,14 +484,15 @@ function toggleForm() {
   wrap.style.display=open?'none':'block';
 }
 function addSprint() {
-  const week=document.getElementById('f-week').value;
-  const recruiter=document.getElementById('f-recruiter').value;
-  const niveau=document.getElementById('f-niveau').value;
-  const regio=document.getElementById('f-regio').value;
-  const verstuurd=parseInt(document.getElementById('f-verstuurd').value)||0;
-  const reacties=parseInt(document.getElementById('f-reacties').value)||0;
-  sprints.push({id:nextId++,week,recruiter,niveau,regio,verstuurd,reacties,positief:0});
-  syncSlider(); syncSprintFilter(); renderAll();
+  const week     = document.getElementById('f-week').value;
+  const sessie   = document.getElementById('f-sessie').value;
+  const recruiter= document.getElementById('f-recruiter').value;
+  const niveau   = document.getElementById('f-niveau').value;
+  const regio    = document.getElementById('f-regio').value;
+  const verstuurd= parseInt(document.getElementById('f-verstuurd').value)||0;
+  const reacties = parseInt(document.getElementById('f-reacties').value)||0;
+  sprints.push({id:nextId++,week,sessie,recruiter,niveau,regio,verstuurd,reacties,positief:0});
+  syncSlider(); syncWeekFilter(); renderAll();
   document.getElementById('f-verstuurd').value='';
   document.getElementById('f-reacties').value='';
   const n=document.getElementById('saveNote'); n.style.display='block';
@@ -512,7 +502,7 @@ function addSprint() {
 function deleteSprint(id) {
   if(!confirm('Sprint verwijderen?')) return;
   sprints=sprints.filter(s=>s.id!==id);
-  syncSlider(); syncSprintFilter(); renderAll(); scheduleSave();
+  syncSlider(); syncWeekFilter(); renderAll(); scheduleSave();
 }
 function updField(id,field,val) {
   const s=sprints.find(s=>s.id===id); if(!s) return;
@@ -525,24 +515,32 @@ function updField(id,field,val) {
 /* ── RENDER ── */
 function renderKPIs() {
   const fs=filtered();
-  const sent=fs.reduce((a,s)=>a+s.verstuurd,0), react=fs.reduce((a,s)=>a+s.reacties,0), pos=fs.reduce((a,s)=>a+s.positief,0);
-  document.getElementById('kpi-sent').textContent=sent;
-  document.getElementById('kpi-sent-sub').textContent=fs.length+' sprint'+(fs.length!==1?'s':'');
-  document.getElementById('kpi-react').textContent=react;
-  document.getElementById('kpi-rate').textContent=(sent>0?Math.round(react/sent*100):0)+'% respons';
-  document.getElementById('kpi-pos').textContent=pos;
-  document.getElementById('kpi-pos-pct').textContent=(react>0?Math.round(pos/react*100):0)+'% van reacties';
-  document.getElementById('kpi-avg').textContent=fs.length>0?Math.round(sent/fs.length):0;
+  const sent  = fs.reduce((a,s)=>a+s.verstuurd,0);
+  const react = fs.reduce((a,s)=>a+s.reacties,0);
+  const pos   = fs.reduce((a,s)=>a+s.positief,0);
+  // Gemiddelde = totaal berichten / aantal unieke sessies (week+sessienr)
+  const uSess = uniqueSessions(fs);
+  const avg   = uSess>0 ? Math.round(sent/uSess) : 0;
+
+  document.getElementById('kpi-sent').textContent    = sent;
+  document.getElementById('kpi-sent-sub').textContent = fs.length+' rij'+(fs.length!==1?'en':'');
+  document.getElementById('kpi-react').textContent   = react;
+  document.getElementById('kpi-rate').textContent    = (sent>0?Math.round(react/sent*100):0)+'% respons';
+  document.getElementById('kpi-pos').textContent     = pos;
+  document.getElementById('kpi-pos-pct').textContent = (react>0?Math.round(pos/react*100):0)+'% van reacties';
+  document.getElementById('kpi-avg').textContent     = avg;
+  document.getElementById('kpi-avg-sub').textContent = uSess+' unieke sessie'+(uSess!==1?'s':'');
 }
 
 function renderTable() {
   const fs=filtered(), body=document.getElementById('sprintBody');
-  if(!fs.length){ body.innerHTML='<tr><td colspan="8" class="empty-row">Geen sprint-sessies — voeg er een toe of pas de filters aan.</td></tr>'; return; }
+  if(!fs.length){ body.innerHTML='<tr><td colspan="9" class="empty-row">Geen sprint-sessies — voeg er een toe of pas de filters aan.</td></tr>'; return; }
   body.innerHTML='';
   fs.forEach(s=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`
       <td style="font-weight:600;">${s.week}</td>
+      <td><span class="ts-badge">S${s.sessie||1}</span></td>
       <td>${s.recruiter}</td>
       <td><span class="tag ${NIVEAU_TAG[s.niveau]||'tn-medior'}">${s.niveau}</span></td>
       <td><span class="tag ${REGIO_TAG[s.regio]||'tr-midden'}">${s.regio}</span></td>
@@ -568,18 +566,18 @@ function makeBars(cid,keys,cols,getVal) {
     </div>`).join('');
 }
 
-function renderNiveauBars() { const fs=filtered(),t={}; NIVEAUS.forEach(n=>t[n]=0); fs.forEach(s=>{if(t[s.niveau]!==undefined)t[s.niveau]+=s.verstuurd;}); makeBars('niveauBars',NIVEAUS,NIVEAU_COLS,k=>t[k]); }
-function renderRegioBars()  { const fs=filtered(),t={}; REGIOS.forEach(r=>t[r]=0);  fs.forEach(s=>{if(t[s.regio]!==undefined)t[s.regio]+=s.verstuurd;});   makeBars('regioBars',REGIOS,REGIO_COLS,k=>t[k]); }
+function renderNiveauBars()   { const fs=filtered(),t={}; NIVEAUS.forEach(n=>t[n]=0);    fs.forEach(s=>{if(t[s.niveau]!==undefined)t[s.niveau]+=s.verstuurd;});    makeBars('niveauBars',NIVEAUS,NIVEAU_COLS,k=>t[k]); }
+function renderRegioBars()    { const fs=filtered(),t={}; REGIOS.forEach(r=>t[r]=0);     fs.forEach(s=>{if(t[s.regio]!==undefined)t[s.regio]+=s.verstuurd;});      makeBars('regioBars',REGIOS,REGIO_COLS,k=>t[k]); }
 function renderRecruiterBars(){ const fs=filtered(),t={}; RECRUITERS.forEach(r=>t[r]=0); fs.forEach(s=>{if(t[s.recruiter]!==undefined)t[s.recruiter]+=s.verstuurd;}); makeBars('recruiterBars',RECRUITERS,REC_COLS,k=>t[k]); }
 
 function renderReactie() {
   const fs=filtered();
-  const sent=fs.reduce((a,s)=>a+s.verstuurd,0),react=fs.reduce((a,s)=>a+s.reacties,0),pos=fs.reduce((a,s)=>a+s.positief,0);
+  const sent=fs.reduce((a,s)=>a+s.verstuurd,0), react=fs.reduce((a,s)=>a+s.reacties,0), pos=fs.reduce((a,s)=>a+s.positief,0);
   const items=[
-    {label:'Geen reactie',       count:sent-react, bg:'rgba(246,198,198,0.35)',border:'#F6C6C6',             color:'#a05050'},
-    {label:'Reactie (totaal)',   count:react,      bg:'rgba(158,212,216,0.3)', border:'#9ED4D8',             color:'#1a6e7a'},
-    {label:'Positief',          count:pos,        bg:'rgba(67,176,140,0.2)',  border:'#43B08C',             color:'#007059'},
-    {label:'Neutraal/Negatief', count:react-pos,  bg:'rgba(17,54,66,0.07)',   border:'rgba(17,54,66,0.25)', color:'#8a9fa5'},
+    {label:'Geen reactie',      count:sent-react, bg:'rgba(246,198,198,0.35)',border:'#F6C6C6',            color:'#a05050'},
+    {label:'Reactie (totaal)',  count:react,      bg:'rgba(158,212,216,0.3)', border:'#9ED4D8',            color:'#1a6e7a'},
+    {label:'Positief',         count:pos,        bg:'rgba(67,176,140,0.2)',  border:'#43B08C',            color:'#007059'},
+    {label:'Neutraal/Negatief',count:react-pos,  bg:'rgba(17,54,66,0.07)',   border:'rgba(17,54,66,0.25)',color:'#8a9fa5'},
   ];
   document.getElementById('reactieList').innerHTML=items.map(it=>{
     const pct=sent>0?Math.round(it.count/sent*100):0;
@@ -594,7 +592,7 @@ function renderTrend() {
   const weeks=allWeeks();
   const ds=RECRUITERS.map((r,i)=>({
     label:r,
-    data:weeks.map(w=>sprints.filter(s=>s.week===w&&s.recruiter===r&&(af.regio==='all'||s.regio===af.regio)).reduce((a,s)=>a+s.verstuurd,0)),
+    data:weeks.map(w=>sprints.filter(s=>s.week===w&&s.recruiter===r&&(af.regio==='all'||s.regio===af.regio)&&(af.sessie==='all'||s.sessie===af.sessie)).reduce((a,s)=>a+s.verstuurd,0)),
     borderColor:REC_COLS[i],backgroundColor:REC_COLS[i]+'33',borderWidth:2,pointRadius:4,pointBackgroundColor:REC_COLS[i],tension:0.3,fill:false
   }));
   const ctx=document.getElementById('trendChart').getContext('2d');
@@ -614,14 +612,13 @@ function renderTrend() {
 function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend(); }
 
 function exportCSV() {
-  const fs=filtered(),rows=[['Week','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Respons%']];
-  fs.forEach(s=>rows.push([s.week,s.recruiter,s.niveau,s.regio,s.verstuurd,s.reacties,s.positief,s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'0%']));
+  const fs=filtered(), rows=[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Respons%']];
+  fs.forEach(s=>rows.push([s.week,'S'+(s.sessie||1),s.recruiter,s.niveau,s.regio,s.verstuurd,s.reacties,s.positief,s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'0%']));
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));
   a.download='agium_linkedin_2026.csv'; a.click();
 }
 
-/* ── BOOT ── */
 loadFromGitHub();
 </script>
 </body>
