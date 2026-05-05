@@ -19,7 +19,17 @@
       "verstuurd": 18,
       "reacties": 0,
       "positief": 0
+    },
+    {
+      "id": 6,
+      "week": "Week 1",
+      "recruiter": "Devlin",
+      "niveau": "Medior",
+      "regio": "Noord",
+      "verstuurd": 30,
+      "reacties": 0,
+      "positief": 0
     }
   ],
-  "nextId": 6
+  "nextId": 7
 }
