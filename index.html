@@ -116,9 +116,10 @@
   .bar-list { display:flex; flex-direction:column; gap:9px; }
   .bar-row  { display:flex; align-items:center; gap:10px; }
   .bar-name { min-width:105px; font-size:11px; font-weight:500; color:var(--ag-dark); }
+  .bar-name.rank-1 { font-weight:700; color:var(--ag-dark); }
   .bar-track { flex:1; background:var(--ag-bg); border-radius:5px; height:12px; overflow:hidden; }
-  .bar-fill  { height:100%; border-radius:5px; transition:width 0.45s ease; }
-  .bar-num  { min-width:30px; text-align:right; font-size:13px; font-weight:600; color:var(--ag-dark); }
+  .bar-fill  { height:100%; border-radius:5px; width:0%; transition:width 0.55s cubic-bezier(0.4,0,0.2,1); }
+  .bar-num  { min-width:30px; text-align:right; font-size:13px; font-weight:600; color:var(--ag-dark); transition:opacity 0.3s ease; }
 
   .reactie-list { display:flex; flex-direction:column; gap:7px; }
   .reactie-item { display:flex; align-items:center; justify-content:space-between; padding:7px 12px; border-radius:8px; border-left:3px solid transparent; }
@@ -556,19 +557,71 @@ function renderTable() {
   });
 }
 
-function makeBars(cid,keys,cols,getVal) {
-  const max=Math.max(...keys.map(getVal),1);
-  document.getElementById(cid).innerHTML=keys.map((k,i)=>`
+// Generic animated bar renderer — fixed order, no sorting
+function makeBars(cid, keys, cols, getVal) {
+  const max = Math.max(...keys.map(getVal), 1);
+  const container = document.getElementById(cid);
+  container.innerHTML = keys.map((k, i) => `
     <div class="bar-row">
       <span class="bar-name">${k}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(getVal(k)/max*100)}%;background:${cols[i]};"></div></div>
+      <div class="bar-track"><div class="bar-fill" data-pct="${Math.round(getVal(k)/max*100)}" style="width:0%;background:${cols[i]};"></div></div>
       <span class="bar-num">${getVal(k)}</span>
     </div>`).join('');
+  // Trigger animation after paint
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    container.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }));
 }
 
-function renderNiveauBars()   { const fs=filtered(),t={}; NIVEAUS.forEach(n=>t[n]=0);    fs.forEach(s=>{if(t[s.niveau]!==undefined)t[s.niveau]+=s.verstuurd;});    makeBars('niveauBars',NIVEAUS,NIVEAU_COLS,k=>t[k]); }
-function renderRegioBars()    { const fs=filtered(),t={}; REGIOS.forEach(r=>t[r]=0);     fs.forEach(s=>{if(t[s.regio]!==undefined)t[s.regio]+=s.verstuurd;});      makeBars('regioBars',REGIOS,REGIO_COLS,k=>t[k]); }
-function renderRecruiterBars(){ const fs=filtered(),t={}; RECRUITERS.forEach(r=>t[r]=0); fs.forEach(s=>{if(t[s.recruiter]!==undefined)t[s.recruiter]+=s.verstuurd;}); makeBars('recruiterBars',RECRUITERS,REC_COLS,k=>t[k]); }
+// Recruiter bars: sorted high→low, animated, with rank indicator
+function renderRecruiterBars() {
+  const fs = filtered();
+  const totals = {};
+  RECRUITERS.forEach(r => totals[r] = 0);
+  fs.forEach(s => { if (totals[s.recruiter] !== undefined) totals[s.recruiter] += s.verstuurd; });
+
+  // Sort recruiters by value descending
+  const sorted = [...RECRUITERS].sort((a, b) => totals[b] - totals[a]);
+  const max = Math.max(...sorted.map(r => totals[r]), 1);
+
+  // Map original recruiter to its fixed color
+  const colorMap = {};
+  RECRUITERS.forEach((r, i) => colorMap[r] = REC_COLS[i]);
+
+  const container = document.getElementById('recruiterBars');
+  container.innerHTML = sorted.map((r, i) => `
+    <div class="bar-row" style="transition:all 0.4s ease;">
+      <span class="bar-name ${i===0?'rank-1':''}" style="display:flex;align-items:center;gap:5px;">
+        <span style="font-size:10px;font-weight:700;color:${i===0?colorMap[r]:'var(--ag-muted)'};min-width:14px;">${i+1}</span>
+        ${r}
+      </span>
+      <div class="bar-track">
+        <div class="bar-fill" data-pct="${Math.round(totals[r]/max*100)}" style="width:0%;background:${colorMap[r]};"></div>
+      </div>
+      <span class="bar-num">${totals[r]}</span>
+    </div>`).join('');
+
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    container.querySelectorAll('.bar-fill').forEach(el => {
+      el.style.width = el.dataset.pct + '%';
+    });
+  }));
+}
+
+function renderNiveauBars() {
+  const fs=filtered(),t={};
+  NIVEAUS.forEach(n=>t[n]=0);
+  fs.forEach(s=>{if(t[s.niveau]!==undefined)t[s.niveau]+=s.verstuurd;});
+  makeBars('niveauBars',NIVEAUS,NIVEAU_COLS,k=>t[k]);
+}
+function renderRegioBars() {
+  const fs=filtered(),t={};
+  REGIOS.forEach(r=>t[r]=0);
+  fs.forEach(s=>{if(t[s.regio]!==undefined)t[s.regio]+=s.verstuurd;});
+  makeBars('regioBars',REGIOS,REGIO_COLS,k=>t[k]);
+}
 
 function renderReactie() {
   const fs=filtered();
