@@ -8,7 +8,8 @@
       "regio": "Midden",
       "verstuurd": 40,
       "reacties": 0,
-      "positief": 0
+      "positief": 0,
+      "sessie": "1"
     },
     {
       "id": 5,
@@ -18,7 +19,8 @@
       "regio": "Noord",
       "verstuurd": 18,
       "reacties": 0,
-      "positief": 0
+      "positief": 0,
+      "sessie": "1"
     },
     {
       "id": 6,
@@ -27,8 +29,9 @@
       "niveau": "Medior",
       "regio": "Noord",
       "verstuurd": 30,
-      "reacties": 0,
-      "positief": 0
+      "reacties": 2,
+      "positief": 0,
+      "sessie": "1"
     }
   ],
   "nextId": 7
