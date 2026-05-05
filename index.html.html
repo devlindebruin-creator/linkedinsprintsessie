@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LinkedIn Sprint Dashboard — Agium</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+  :root {
+    --ag-dark: #113642;
+    --ag-lichtblauw: #9ED4D8;
+    --ag-groen: #43B08C;
+    --ag-donkergroen: #007059;
+    --ag-roze: #F6C6C6;
+    --ag-bg: #f2f6f7;
+    --ag-card: #ffffff;
+    --ag-border: rgba(17,54,66,0.12);
+    --ag-muted: rgba(17,54,66,0.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'DM Sans', sans-serif; }
+  body { background: var(--ag-bg); min-height: 100vh; }
+
+  /* ── HEADER ── */
+  .header { background: var(--ag-dark); color: #fff; padding: 14px 28px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo-ring { width: 34px; height: 34px; border-radius: 50%; border: 2.5px solid var(--ag-lichtblauw); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .logo-inner { width: 13px; height: 13px; border-radius: 50%; background: var(--ag-lichtblauw); opacity: 0.7; }
+  .header-title { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .header-sub { font-size: 11px; opacity: 0.55; margin-top: 2px; }
+  .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .sync-status { font-size: 11px; opacity: 0.7; display: flex; align-items: center; gap: 5px; }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ag-lichtblauw); flex-shrink: 0; }
+  .sync-dot.syncing { background: #f6c26c; animation: pulse 1s infinite; }
+  .sync-dot.ok      { background: var(--ag-groen); }
+  .sync-dot.err     { background: var(--ag-roze); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .hbtn { padding: 6px 14px; border: none; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
+  .hbtn-green { background: var(--ag-groen); color: #fff; }
+  .hbtn-green:hover { background: var(--ag-donkergroen); }
+  .hbtn-outline { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+  .hbtn-outline:hover { background: rgba(255,255,255,0.2); }
+
+  /* ── TOKEN MODAL ── */
+  .modal-bg { position: fixed; inset: 0; background: rgba(17,54,66,0.55); display: flex; align-items: center; justify-content: center; z-index: 999; }
+  .modal { background: #fff; border-radius: 14px; padding: 28px; width: 440px; max-width: 95vw; box-shadow: 0 8px 32px rgba(17,54,66,0.18); }
+  .modal h2 { font-size: 16px; font-weight: 600; color: var(--ag-dark); margin-bottom: 6px; }
+  .modal p  { font-size: 12px; color: var(--ag-muted); margin-bottom: 16px; line-height: 1.6; }
+  .modal input { width: 100%; border: 1.5px solid var(--ag-border); border-radius: 8px; padding: 9px 12px; font-size: 13px; color: var(--ag-dark); font-family: monospace; margin-bottom: 12px; }
+  .modal input:focus { outline: 2px solid var(--ag-lichtblauw); border-color: transparent; }
+  .modal-btns { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal-note { font-size: 11px; color: var(--ag-muted); margin-top: 10px; }
+  .modal-err  { font-size: 11px; color: #c0392b; margin-top: 8px; display: none; }
+
+  /* ── FILTERS ── */
+  .filters { background: #fff; border-bottom: 1.5px solid var(--ag-border); padding: 10px 28px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .filter-sep { width: 1px; height: 26px; background: var(--ag-border); flex-shrink: 0; }
+  .filter-label { font-size: 10px; font-weight: 700; color: var(--ag-dark); text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap; margin-right: 6px; }
+  .filter-group { display: flex; align-items: center; }
+  .tab-group { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tab-btn { padding: 5px 12px; border-radius: 20px; border: 1.5px solid var(--ag-border); background: transparent; font-size: 12px; font-weight: 500; color: var(--ag-dark); cursor: pointer; transition: all 0.15s; white-space: nowrap; }
+  .tab-btn:hover { background: rgba(17,54,66,0.07); }
+  .tab-btn.active      { background: var(--ag-dark); color: #fff; border-color: var(--ag-dark); }
+  .tab-btn.rn.active   { background: #1a6e7a; border-color: #1a6e7a; }
+  .tab-btn.rm.active   { background: var(--ag-donkergroen); border-color: var(--ag-donkergroen); }
+  .tab-btn.rz.active   { background: #a05050; border-color: #a05050; }
+  .week-wrap { display: flex; align-items: center; gap: 10px; }
+  .week-label { font-size: 12px; font-weight: 600; color: var(--ag-dark); min-width: 78px; }
+  input[type=range] { accent-color: var(--ag-groen); width: 130px; }
+  select { border: 1.5px solid var(--ag-border); border-radius: 7px; padding: 5px 10px; font-size: 12px; color: var(--ag-dark); background: var(--ag-bg); font-family: inherit; cursor: pointer; }
+
+  /* ── BODY ── */
+  .body { padding: 20px 28px; display: flex; flex-direction: column; gap: 18px; }
+  .kpi-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+  .kpi-card { background: var(--ag-card); border: 1px solid var(--ag-border); border-radius: 12px; padding: 16px 18px; position: relative; overflow: hidden; }
+  .kpi-card::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; }
+  .kpi-card.c-dark::before  { background: var(--ag-dark); }
+  .kpi-card.c-green::before { background: var(--ag-groen); }
+  .kpi-card.c-teal::before  { background: var(--ag-lichtblauw); }
+  .kpi-card.c-pink::before  { background: var(--ag-roze); }
+  .kpi-label { font-size: 11px; font-weight: 600; color: var(--ag-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .kpi-val   { font-size: 32px; font-weight: 600; color: var(--ag-dark); line-height: 1; }
+  .kpi-sub   { font-size: 12px; color: var(--ag-muted); margin-top: 5px; }
+  .kpi-rate  { font-size: 13px; font-weight: 600; color: var(--ag-groen); margin-top: 5px; }
+
+  .row2 { display: grid; grid-template-columns: 1.35fr 1fr; gap: 18px; }
+  .card { background: var(--ag-card); border: 1px solid var(--ag-border); border-radius: 12px; padding: 18px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--ag-dark); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+  .sub-title  { font-size: 12px; font-weight: 600; color: var(--ag-dark); margin: 14px 0 10px; }
+  .add-btn { padding: 5px 13px; background: var(--ag-dark); color: #fff; border: none; border-radius: 7px; font-size: 11px; font-weight: 700; cursor: pointer; transition: background 0.15s; }
+  .add-btn:hover { background: var(--ag-donkergroen); }
+  .add-form { background: var(--ag-bg); border-radius: 8px; padding: 12px; margin-bottom: 12px; display: none; }
+  .fg { display: grid; grid-template-columns: repeat(6,1fr) auto; gap: 8px; align-items: end; }
+  .fg label { font-size: 10px; font-weight: 700; color: var(--ag-muted); display: block; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .fg input, .fg select { width:100%; border:1.5px solid var(--ag-border); border-radius:7px; padding:6px 8px; font-size:12px; color:var(--ag-dark); background:#fff; font-family:inherit; }
+  .fg input:focus, .fg select:focus { outline:2px solid var(--ag-lichtblauw); border-color:transparent; }
+  .fa { display:flex; gap:5px; padding-bottom:1px; }
+  .save-note { font-size:11px; color:var(--ag-groen); font-weight:600; margin-top:6px; display:none; }
+
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th { text-align:left; font-size:10px; font-weight:700; color:var(--ag-muted); text-transform:uppercase; letter-spacing:0.5px; padding:0 7px 8px; border-bottom:1.5px solid var(--ag-border); }
+  td { padding:7px; border-bottom:0.5px solid var(--ag-border); color:var(--ag-dark); vertical-align:middle; }
+  tr:last-child td { border-bottom:none; }
+  td input[type=number] { width:48px; border:1.5px solid var(--ag-border); border-radius:6px; padding:3px 5px; font-size:12px; color:var(--ag-dark); background:var(--ag-bg); font-family:inherit; }
+  td input[type=number]:focus { outline:2px solid var(--ag-lichtblauw); border-color:transparent; }
+
+  .tag { display:inline-block; padding:2px 8px; border-radius:10px; font-size:10px; font-weight:700; }
+  .tn-junior { background:rgba(158,212,216,0.4);  color:#1a6e7a; }
+  .tn-medior { background:rgba(67,176,140,0.2);   color:var(--ag-donkergroen); }
+  .tn-senior { background:rgba(17,54,66,0.12);    color:var(--ag-dark); }
+  .tn-werko  { background:rgba(246,198,198,0.6);  color:#a05050; }
+  .tr-noord  { background:rgba(26,110,122,0.12);  color:#1a6e7a; }
+  .tr-midden { background:rgba(0,112,89,0.12);    color:var(--ag-donkergroen); }
+  .tr-zuid   { background:rgba(160,80,80,0.12);   color:#a05050; }
+
+  .del-btn { background:none; border:none; cursor:pointer; color:var(--ag-muted); font-size:14px; padding:2px 4px; border-radius:4px; }
+  .del-btn:hover { color:#c0392b; background:rgba(192,57,43,0.08); }
+
+  .bar-list { display:flex; flex-direction:column; gap:9px; }
+  .bar-row  { display:flex; align-items:center; gap:10px; }
+  .bar-name { min-width:105px; font-size:11px; font-weight:500; color:var(--ag-dark); }
+  .bar-track { flex:1; background:var(--ag-bg); border-radius:5px; height:12px; overflow:hidden; }
+  .bar-fill  { height:100%; border-radius:5px; transition:width 0.45s ease; }
+  .bar-num  { min-width:30px; text-align:right; font-size:13px; font-weight:600; color:var(--ag-dark); }
+
+  .reactie-list { display:flex; flex-direction:column; gap:7px; }
+  .reactie-item { display:flex; align-items:center; justify-content:space-between; padding:7px 12px; border-radius:8px; border-left:3px solid transparent; }
+  .reactie-right { display:flex; align-items:baseline; gap:5px; }
+  .reactie-count { font-size:18px; font-weight:600; }
+  .reactie-pct   { font-size:11px; color:var(--ag-muted); }
+
+  .row3 { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .chart-wrap { position:relative; width:100%; height:210px; }
+  .empty-row  { text-align:center; color:var(--ag-muted); padding:20px; font-size:12px; }
+
+  /* loading overlay */
+  #loadOverlay { position:fixed; inset:0; background:var(--ag-dark); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; color:#fff; gap:14px; }
+  #loadOverlay .spin { width:32px; height:32px; border:3px solid rgba(158,212,216,0.3); border-top-color:var(--ag-lichtblauw); border-radius:50%; animation:spin 0.8s linear infinite; }
+  #loadOverlay p { font-size:13px; opacity:0.7; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  @media (max-width:1000px) {
+    .kpi-row { grid-template-columns:repeat(2,1fr); }
+    .row2, .row3 { grid-template-columns:1fr; }
+    .fg { grid-template-columns:1fr 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Loading overlay -->
+<div id="loadOverlay">
+  <div class="spin"></div>
+  <p>Dashboard laden...</p>
+</div>
+
+<!-- Token modal -->
+<div class="modal-bg" id="tokenModal" style="display:none;">
+  <div class="modal">
+    <h2>GitHub koppelen</h2>
+    <p>Voer je GitHub Personal Access Token in om data op te slaan in <strong>devlindebruin-creator/linkedinsprintsessie</strong>.<br>Token wordt alleen lokaal opgeslagen in je browser.</p>
+    <input type="password" id="tokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" autocomplete="off">
+    <div class="modal-btns">
+      <button class="hbtn hbtn-outline" style="color:var(--ag-dark);border-color:var(--ag-border);background:transparent;" onclick="closeTokenModal()">Annuleer</button>
+      <button class="hbtn hbtn-green" onclick="saveToken()">Opslaan &amp; verbinden</button>
+    </div>
+    <div class="modal-err" id="tokenErr">Token ongeldig of geen toegang tot de repo. Controleer de scope (repo).</div>
+    <div class="modal-note">Aanmaken via <a href="https://github.com/settings/tokens" target="_blank" style="color:var(--ag-donkergroen);">github.com/settings/tokens</a> — scope: <code>repo</code></div>
+  </div>
+</div>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo-ring"><div class="logo-inner"></div></div>
+    <div>
+      <div class="header-title">LinkedIn Sprint Dashboard</div>
+      <div class="header-sub">Agium Finance &amp; Control — T&amp;B Team · 2026</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="sync-status">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncText">Verbinden...</span>
+    </div>
+    <button class="hbtn hbtn-outline" onclick="openTokenModal()">Token</button>
+    <button class="hbtn hbtn-green" onclick="manualSave()">&#8593; Opslaan</button>
+    <button class="hbtn hbtn-outline" onclick="exportCSV()">&#8595; CSV</button>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="filters">
+  <div class="filter-group">
+    <span class="filter-label">Recruiter</span>
+    <div class="tab-group" id="recruiterTabs">
+      <button class="tab-btn active" onclick="setF('recruiter','all',this,'recruiterTabs')">Iedereen</button>
+      <button class="tab-btn" onclick="setF('recruiter','Beaudine',this,'recruiterTabs')">Beaudine</button>
+      <button class="tab-btn" onclick="setF('recruiter','Patrick',this,'recruiterTabs')">Patrick</button>
+      <button class="tab-btn" onclick="setF('recruiter','Marc',this,'recruiterTabs')">Marc</button>
+      <button class="tab-btn" onclick="setF('recruiter','Devlin',this,'recruiterTabs')">Devlin</button>
+    </div>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <span class="filter-label">Regio</span>
+    <div class="tab-group" id="regioTabs">
+      <button class="tab-btn active" onclick="setF('regio','all',this,'regioTabs')">Alle</button>
+      <button class="tab-btn rn" onclick="setF('regio','Noord',this,'regioTabs')">Noord</button>
+      <button class="tab-btn rm" onclick="setF('regio','Midden',this,'regioTabs')">Midden</button>
+      <button class="tab-btn rz" onclick="setF('regio','Zuid',this,'regioTabs')">Zuid</button>
+    </div>
+  </div>
+  <div class="filter-sep"></div>
+  <div class="filter-group">
+    <span class="filter-label">Week</span>
+    <div class="week-wrap">
+      <input type="range" id="weekSlider" min="0" max="0" value="0" step="1" oninput="onWeekSlide()">
+      <span class="week-label" id="weekDisplay">Alle weken</span>
+    </div>
+  </div>
+  <div class="filter-group" style="margin-left:auto;">
+    <select id="sprintFilter" onchange="renderAll()">
+      <option value="all">Alle sprints</option>
+    </select>
+  </div>
+</div>
+
+<!-- Body -->
+<div class="body">
+  <div class="kpi-row">
+    <div class="kpi-card c-dark">
+      <div class="kpi-label">Berichten verstuurd</div>
+      <div class="kpi-val" id="kpi-sent">0</div>
+      <div class="kpi-sub" id="kpi-sent-sub">— sprints</div>
+    </div>
+    <div class="kpi-card c-green">
+      <div class="kpi-label">Reacties ontvangen</div>
+      <div class="kpi-val" id="kpi-react">0</div>
+      <div class="kpi-rate" id="kpi-rate">— respons</div>
+    </div>
+    <div class="kpi-card c-teal">
+      <div class="kpi-label">Positieve reacties</div>
+      <div class="kpi-val" id="kpi-pos">0</div>
+      <div class="kpi-sub" id="kpi-pos-pct">— van reacties</div>
+    </div>
+    <div class="kpi-card c-pink">
+      <div class="kpi-label">Gem. per sprint</div>
+      <div class="kpi-val" id="kpi-avg">0</div>
+      <div class="kpi-sub">berichten / sessie</div>
+    </div>
+  </div>
+
+  <div class="row2">
+    <div class="card">
+      <div class="card-title">
+        <span>Sprint sessies</span>
+        <button class="add-btn" onclick="toggleForm()">+ Sprint toevoegen</button>
+      </div>
+      <div class="add-form" id="addFormWrap">
+        <div class="fg">
+          <div><label>Week</label><select id="f-week"></select></div>
+          <div><label>Recruiter</label>
+            <select id="f-recruiter">
+              <option>Beaudine</option><option>Patrick</option><option>Marc</option><option>Devlin</option>
+            </select>
+          </div>
+          <div><label>Niveau</label>
+            <select id="f-niveau">
+              <option>Junior</option><option>Medior</option><option>Senior</option><option>Werkondernemer</option>
+            </select>
+          </div>
+          <div><label>Regio</label>
+            <select id="f-regio"><option>Noord</option><option>Midden</option><option>Zuid</option></select>
+          </div>
+          <div><label>Verstuurd</label><input type="number" id="f-verstuurd" placeholder="0" min="0" step="1"></div>
+          <div><label>Reacties</label><input type="number" id="f-reacties" placeholder="0" min="0" step="1"></div>
+          <div class="fa">
+            <button class="add-btn" onclick="addSprint()">Opslaan</button>
+            <button class="add-btn" style="background:var(--ag-muted);" onclick="toggleForm()">✕</button>
+          </div>
+        </div>
+        <div class="save-note" id="saveNote">✓ Sprint toegevoegd!</div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Week</th><th>Recruiter</th><th>Niveau</th><th>Regio</th><th>Verstuurd</th><th>React. / Pos.</th><th>%</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="sprintBody"></tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;">Berichten per niveau</div>
+      <div class="bar-list" id="niveauBars"></div>
+      <div class="sub-title">Berichten per regio</div>
+      <div class="bar-list" id="regioBars"></div>
+      <div class="sub-title">Reacties overzicht</div>
+      <div class="reactie-list" id="reactieList"></div>
+    </div>
+  </div>
+
+  <div class="row3">
+    <div class="card">
+      <div class="card-title">Berichten per recruiter</div>
+      <div class="bar-list" id="recruiterBars"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Trend per week</div>
+      <div class="chart-wrap">
+        <canvas id="trendChart" role="img" aria-label="Lijndiagram berichten per week per recruiter">Berichten per week.</canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── CONFIG ── */
+const OWNER = 'devlindebruin-creator';
+const REPO  = 'linkedinsprintsessie';
+const FILE  = 'data.json';
+const API   = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
+
+/* ── LOOKUPS ── */
+const RECRUITERS  = ['Beaudine','Patrick','Marc','Devlin'];
+const NIVEAUS     = ['Junior','Medior','Senior','Werkondernemer'];
+const REGIOS      = ['Noord','Midden','Zuid'];
+const NIVEAU_TAG  = { Junior:'tn-junior', Medior:'tn-medior', Senior:'tn-senior', Werkondernemer:'tn-werko' };
+const REGIO_TAG   = { Noord:'tr-noord', Midden:'tr-midden', Zuid:'tr-zuid' };
+const NIVEAU_COLS = ['#9ED4D8','#43B08C','#113642','#F6C6C6'];
+const REGIO_COLS  = ['#1a6e7a','#007059','#a05050'];
+const REC_COLS    = ['#113642','#43B08C','#9ED4D8','#007059'];
+
+/* ── STATE ── */
+let sprints   = [];
+let fileSHA   = null;
+let nextId    = 1;
+let af        = { recruiter:'all', regio:'all' };
+let activeWeek = 'all';
+let trendChart = null;
+let saveTimer  = null;
+
+/* ── TOKEN ── */
+function getToken() { return localStorage.getItem('ag_gh_token') || ''; }
+function setToken(t) { localStorage.setItem('ag_gh_token', t); }
+
+function openTokenModal() {
+  document.getElementById('tokenInput').value = getToken();
+  document.getElementById('tokenErr').style.display = 'none';
+  document.getElementById('tokenModal').style.display = 'flex';
+}
+function closeTokenModal() { document.getElementById('tokenModal').style.display = 'none'; }
+async function saveToken() {
+  const t = document.getElementById('tokenInput').value.trim();
+  if (!t) return;
+  setSyncState('syncing','Token testen...');
+  try {
+    const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, { headers: authHeaders(t) });
+    if (!r.ok) throw new Error('no access');
+    setToken(t);
+    closeTokenModal();
+    await loadFromGitHub();
+  } catch {
+    document.getElementById('tokenErr').style.display = 'block';
+    setSyncState('err','Token onjuist');
+  }
+}
+
+/* ── SYNC UI ── */
+function setSyncState(state, text) {
+  const dot  = document.getElementById('syncDot');
+  const span = document.getElementById('syncText');
+  dot.className = 'sync-dot ' + state;
+  span.textContent = text;
+}
+
+function authHeaders(token) {
+  return { 'Authorization': 'token ' + token, 'Content-Type': 'application/json', 'Accept': 'application/vnd.github.v3+json' };
+}
+
+/* ── GITHUB LOAD ── */
+async function loadFromGitHub() {
+  const token = getToken();
+  if (!token) { setSyncState('err','Geen token'); document.getElementById('loadOverlay').style.display='none'; openTokenModal(); return; }
+  setSyncState('syncing','Laden...');
+  try {
+    const r = await fetch(API, { headers: authHeaders(token) });
+    if (r.status === 404) {
+      // File bestaat nog niet — lege dataset, we maken hem aan bij eerste save
+      sprints = [];
+      fileSHA = null;
+      nextId  = 1;
+      setSyncState('ok', 'Nieuw bestand — sla op om te starten');
+    } else if (!r.ok) {
+      throw new Error('fetch failed');
+    } else {
+      const json = await r.json();
+      fileSHA = json.sha;
+      const decoded = JSON.parse(atob(json.content.replace(/\n/g,'')));
+      sprints = decoded.sprints || [];
+      nextId  = decoded.nextId  || (sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1);
+      setSyncState('ok', 'Gesynchroniseerd');
+    }
+  } catch(e) {
+    setSyncState('err', 'Laden mislukt');
+    // fallback: localStorage
+    const local = localStorage.getItem('ag_li_v3');
+    if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; } catch{} }
+  }
+  document.getElementById('loadOverlay').style.display = 'none';
+  syncSlider(); syncSprintFilter(); renderAll();
+}
+
+/* ── GITHUB SAVE ── */
+async function saveToGitHub() {
+  const token = getToken();
+  if (!token) { setSyncState('err','Geen token — klik Token om in te stellen'); return; }
+  setSyncState('syncing','Opslaan...');
+  const payload = { sprints, nextId };
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
+  const body = { message: 'Dashboard update ' + new Date().toISOString(), content };
+  if (fileSHA) body.sha = fileSHA;
+  try {
+    const r = await fetch(API, { method:'PUT', headers: authHeaders(token), body: JSON.stringify(body) });
+    if (!r.ok) { const e=await r.json(); throw new Error(e.message||'save failed'); }
+    const j = await r.json();
+    fileSHA = j.content.sha;
+    // also cache locally
+    localStorage.setItem('ag_li_v3', JSON.stringify(payload));
+    setSyncState('ok', 'Opgeslagen ' + new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}));
+  } catch(e) {
+    setSyncState('err', 'Opslaan mislukt: ' + e.message);
+  }
+}
+
+function scheduleSave() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveToGitHub, 1500);
+}
+
+function manualSave() { clearTimeout(saveTimer); saveToGitHub(); }
+
+/* ── DATA HELPERS ── */
+function sortWeeks(arr) { return arr.sort((a,b)=>parseInt(a.replace('Week ',''))-parseInt(b.replace('Week ',''))); }
+function allWeeks() { return sortWeeks([...new Set(sprints.map(s=>s.week))]); }
+
+function filtered() {
+  return sprints.filter(s => {
+    if (af.recruiter!=='all' && s.recruiter!==af.recruiter) return false;
+    if (af.regio!=='all' && s.regio!==af.regio) return false;
+    if (activeWeek!=='all' && s.week!==activeWeek) return false;
+    const sf = document.getElementById('sprintFilter').value;
+    if (sf!=='all' && s.week!==sf) return false;
+    return true;
+  });
+}
+
+/* ── FILTER CONTROLS ── */
+function setF(type, val, el, tabId) {
+  af[type]=val;
+  document.querySelectorAll('#'+tabId+' .tab-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  renderAll();
+}
+
+function onWeekSlide() {
+  const weeks=allWeeks(), idx=parseInt(document.getElementById('weekSlider').value);
+  if(idx===0){ activeWeek='all'; document.getElementById('weekDisplay').textContent='Alle weken'; }
+  else { activeWeek=weeks[idx-1]; document.getElementById('weekDisplay').textContent=weeks[idx-1]; }
+  renderAll();
+}
+
+function syncSlider() {
+  const weeks=allWeeks(), slider=document.getElementById('weekSlider');
+  slider.max=weeks.length;
+  if(activeWeek!=='all'){ const i=weeks.indexOf(activeWeek); slider.value=i>=0?i+1:0; if(i<0){activeWeek='all';document.getElementById('weekDisplay').textContent='Alle weken';slider.value=0;} }
+}
+
+function syncSprintFilter() {
+  const sel=document.getElementById('sprintFilter'), cur=sel.value, weeks=allWeeks();
+  sel.innerHTML='<option value="all">Alle sprints</option>'+weeks.map(w=>`<option value="${w}">${w}</option>`).join('');
+  if(weeks.includes(cur)) sel.value=cur;
+}
+
+/* ── FORM ── */
+function weekSelectOpts(sel) {
+  let h=''; for(let dw=1;dw<=26;dw++) h+=`<option value="Week ${dw}">Week ${dw}</option>`;
+  sel.innerHTML=h;
+}
+function toggleForm() {
+  const wrap=document.getElementById('addFormWrap'), open=wrap.style.display==='block';
+  if(!open) weekSelectOpts(document.getElementById('f-week'));
+  wrap.style.display=open?'none':'block';
+}
+function addSprint() {
+  const week=document.getElementById('f-week').value;
+  const recruiter=document.getElementById('f-recruiter').value;
+  const niveau=document.getElementById('f-niveau').value;
+  const regio=document.getElementById('f-regio').value;
+  const verstuurd=parseInt(document.getElementById('f-verstuurd').value)||0;
+  const reacties=parseInt(document.getElementById('f-reacties').value)||0;
+  sprints.push({id:nextId++,week,recruiter,niveau,regio,verstuurd,reacties,positief:0});
+  syncSlider(); syncSprintFilter(); renderAll();
+  document.getElementById('f-verstuurd').value='';
+  document.getElementById('f-reacties').value='';
+  const n=document.getElementById('saveNote'); n.style.display='block';
+  setTimeout(()=>n.style.display='none',1800);
+  scheduleSave();
+}
+function deleteSprint(id) {
+  if(!confirm('Sprint verwijderen?')) return;
+  sprints=sprints.filter(s=>s.id!==id);
+  syncSlider(); syncSprintFilter(); renderAll(); scheduleSave();
+}
+function updField(id,field,val) {
+  const s=sprints.find(s=>s.id===id); if(!s) return;
+  s[field]=parseInt(val)||0;
+  if(s.positief>s.reacties) s.positief=s.reacties;
+  if(s.reacties>s.verstuurd) s.reacties=s.verstuurd;
+  renderKPIs(); renderReactie(); scheduleSave();
+}
+
+/* ── RENDER ── */
+function renderKPIs() {
+  const fs=filtered();
+  const sent=fs.reduce((a,s)=>a+s.verstuurd,0), react=fs.reduce((a,s)=>a+s.reacties,0), pos=fs.reduce((a,s)=>a+s.positief,0);
+  document.getElementById('kpi-sent').textContent=sent;
+  document.getElementById('kpi-sent-sub').textContent=fs.length+' sprint'+(fs.length!==1?'s':'');
+  document.getElementById('kpi-react').textContent=react;
+  document.getElementById('kpi-rate').textContent=(sent>0?Math.round(react/sent*100):0)+'% respons';
+  document.getElementById('kpi-pos').textContent=pos;
+  document.getElementById('kpi-pos-pct').textContent=(react>0?Math.round(pos/react*100):0)+'% van reacties';
+  document.getElementById('kpi-avg').textContent=fs.length>0?Math.round(sent/fs.length):0;
+}
+
+function renderTable() {
+  const fs=filtered(), body=document.getElementById('sprintBody');
+  if(!fs.length){ body.innerHTML='<tr><td colspan="8" class="empty-row">Geen sprint-sessies — voeg er een toe of pas de filters aan.</td></tr>'; return; }
+  body.innerHTML='';
+  fs.forEach(s=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="font-weight:600;">${s.week}</td>
+      <td>${s.recruiter}</td>
+      <td><span class="tag ${NIVEAU_TAG[s.niveau]||'tn-medior'}">${s.niveau}</span></td>
+      <td><span class="tag ${REGIO_TAG[s.regio]||'tr-midden'}">${s.regio}</span></td>
+      <td><strong>${s.verstuurd}</strong></td>
+      <td style="white-space:nowrap;">
+        <input type="number" value="${s.reacties}" min="0" title="Totaal reacties" onchange="updField(${s.id},'reacties',this.value)">
+        <span style="font-size:10px;color:var(--ag-muted);margin:0 3px;">/</span>
+        <input type="number" value="${s.positief}" min="0" title="Positieve reacties" onchange="updField(${s.id},'positief',this.value)">
+      </td>
+      <td style="font-size:11px;color:var(--ag-muted);">${s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'-'}</td>
+      <td><button class="del-btn" onclick="deleteSprint(${s.id})">✕</button></td>`;
+    body.appendChild(tr);
+  });
+}
+
+function makeBars(cid,keys,cols,getVal) {
+  const max=Math.max(...keys.map(getVal),1);
+  document.getElementById(cid).innerHTML=keys.map((k,i)=>`
+    <div class="bar-row">
+      <span class="bar-name">${k}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(getVal(k)/max*100)}%;background:${cols[i]};"></div></div>
+      <span class="bar-num">${getVal(k)}</span>
+    </div>`).join('');
+}
+
+function renderNiveauBars() { const fs=filtered(),t={}; NIVEAUS.forEach(n=>t[n]=0); fs.forEach(s=>{if(t[s.niveau]!==undefined)t[s.niveau]+=s.verstuurd;}); makeBars('niveauBars',NIVEAUS,NIVEAU_COLS,k=>t[k]); }
+function renderRegioBars()  { const fs=filtered(),t={}; REGIOS.forEach(r=>t[r]=0);  fs.forEach(s=>{if(t[s.regio]!==undefined)t[s.regio]+=s.verstuurd;});   makeBars('regioBars',REGIOS,REGIO_COLS,k=>t[k]); }
+function renderRecruiterBars(){ const fs=filtered(),t={}; RECRUITERS.forEach(r=>t[r]=0); fs.forEach(s=>{if(t[s.recruiter]!==undefined)t[s.recruiter]+=s.verstuurd;}); makeBars('recruiterBars',RECRUITERS,REC_COLS,k=>t[k]); }
+
+function renderReactie() {
+  const fs=filtered();
+  const sent=fs.reduce((a,s)=>a+s.verstuurd,0),react=fs.reduce((a,s)=>a+s.reacties,0),pos=fs.reduce((a,s)=>a+s.positief,0);
+  const items=[
+    {label:'Geen reactie',       count:sent-react, bg:'rgba(246,198,198,0.35)',border:'#F6C6C6',             color:'#a05050'},
+    {label:'Reactie (totaal)',   count:react,      bg:'rgba(158,212,216,0.3)', border:'#9ED4D8',             color:'#1a6e7a'},
+    {label:'Positief',          count:pos,        bg:'rgba(67,176,140,0.2)',  border:'#43B08C',             color:'#007059'},
+    {label:'Neutraal/Negatief', count:react-pos,  bg:'rgba(17,54,66,0.07)',   border:'rgba(17,54,66,0.25)', color:'#8a9fa5'},
+  ];
+  document.getElementById('reactieList').innerHTML=items.map(it=>{
+    const pct=sent>0?Math.round(it.count/sent*100):0;
+    return `<div class="reactie-item" style="background:${it.bg};border-left-color:${it.border};">
+      <span style="font-size:12px;font-weight:500;color:${it.color}">${it.label}</span>
+      <div class="reactie-right"><span class="reactie-count" style="color:${it.color}">${it.count}</span><span class="reactie-pct">${pct}%</span></div>
+    </div>`;
+  }).join('');
+}
+
+function renderTrend() {
+  const weeks=allWeeks();
+  const ds=RECRUITERS.map((r,i)=>({
+    label:r,
+    data:weeks.map(w=>sprints.filter(s=>s.week===w&&s.recruiter===r&&(af.regio==='all'||s.regio===af.regio)).reduce((a,s)=>a+s.verstuurd,0)),
+    borderColor:REC_COLS[i],backgroundColor:REC_COLS[i]+'33',borderWidth:2,pointRadius:4,pointBackgroundColor:REC_COLS[i],tension:0.3,fill:false
+  }));
+  const ctx=document.getElementById('trendChart').getContext('2d');
+  if(trendChart) trendChart.destroy();
+  trendChart=new Chart(ctx,{
+    type:'line',data:{labels:weeks,datasets:ds},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'top',labels:{font:{size:10},boxWidth:10,padding:10,color:'#113642'}}},
+      scales:{
+        x:{ticks:{font:{size:10},color:'#11364299',maxRotation:40,autoSkip:false},grid:{display:false}},
+        y:{ticks:{font:{size:10},color:'#11364299'},grid:{color:'#11364211'},beginAtZero:true}
+      }
+    }
+  });
+}
+
+function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend(); }
+
+function exportCSV() {
+  const fs=filtered(),rows=[['Week','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Respons%']];
+  fs.forEach(s=>rows.push([s.week,s.recruiter,s.niveau,s.regio,s.verstuurd,s.reacties,s.positief,s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'0%']));
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));
+  a.download='agium_linkedin_2026.csv'; a.click();
+}
+
+/* ── BOOT ── */
+loadFromGitHub();
+</script>
+</body>
+</html>
