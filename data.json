@@ -1,35 +1,4 @@
 {
-  "sprints": [
-    {
-      "id": 1,
-      "week": "Week 1",
-      "recruiter": "Beaudine",
-      "niveau": "Junior",
-      "regio": "Midden",
-      "verstuurd": 40,
-      "reacties": 0,
-      "positief": 0
-    },
-    {
-      "id": 2,
-      "week": "Week 1",
-      "recruiter": "Patrick",
-      "niveau": "Junior",
-      "regio": "Noord",
-      "verstuurd": 18,
-      "reacties": 0,
-      "positief": 0
-    },
-    {
-      "id": 3,
-      "week": "Week 1",
-      "recruiter": "Devlin",
-      "niveau": "Medior",
-      "regio": "Noord",
-      "verstuurd": 30,
-      "reacties": 0,
-      "positief": 0
-    }
-  ],
+  "sprints": [],
   "nextId": 4
 }
