@@ -32,7 +32,18 @@
       "reacties": 3,
       "positief": 1,
       "sessie": "1"
+    },
+    {
+      "id": 7,
+      "week": "Week 1",
+      "sessie": "2",
+      "recruiter": "Beaudine",
+      "niveau": "Medior",
+      "regio": "Midden",
+      "verstuurd": 44,
+      "reacties": 0,
+      "positief": 0
     }
   ],
-  "nextId": 7
+  "nextId": 8
 }
