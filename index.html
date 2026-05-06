@@ -202,8 +202,8 @@
       <div class="sync-dot" id="syncDot"></div>
       <span id="syncText">Verbinden...</span>
     </div>
-    <button class="hbtn hbtn-outline" onclick="openTokenModal()">Token</button>
-    <button class="hbtn hbtn-green" onclick="manualSave()">&#8593; Opslaan</button>
+    <span class="edit-only"><button class="hbtn hbtn-outline" onclick="openTokenModal()">Token</button></span>
+    <span class="edit-only"><button class="hbtn hbtn-green" onclick="manualSave()">&#8593; Opslaan</button></span>
     <button class="hbtn hbtn-outline" onclick="exportCSV()">&#8595; CSV</button>
     <button class="hbtn hbtn-outline" onclick="exportPDF()" style="background:rgba(246,198,198,0.25);border-color:rgba(246,198,198,0.5);">&#8595; PDF</button>
   </div>
@@ -283,7 +283,7 @@
     <div class="card">
       <div class="card-title">
         <span>Sprint sessies</span>
-        <button class="add-btn" onclick="toggleForm()">+ Sprint toevoegen</button>
+        <button class="add-btn edit-only" onclick="toggleForm()">+ Sprint toevoegen</button>
       </div>
       <div class="add-form" id="addFormWrap">
         <div class="fg">
@@ -395,7 +395,7 @@ async function saveToken() {
   try {
     const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, { headers: authHeaders(t) });
     if (!r.ok) throw new Error();
-    setToken(t); closeTokenModal(); await loadFromGitHub();
+    setToken(t); closeTokenModal(); setEditMode(true); await loadFromGitHub();
   } catch {
     document.getElementById('tokenErr').style.display = 'block';
     setSyncState('err','Token onjuist');
@@ -412,32 +412,46 @@ function authHeaders(token) {
 
 async function loadFromGitHub() {
   const token = getToken();
-  if (!token) { setSyncState('err','Geen token'); document.getElementById('loadOverlay').style.display='none'; openTokenModal(); return; }
   setSyncState('syncing','Laden...');
   try {
-    const r = await fetch(API, { headers: authHeaders(token) });
+    // Altijd proberen te laden — public repo leest zonder token
+    const headers = token ? authHeaders(token) : { 'Accept': 'application/vnd.github.v3+json' };
+    const r = await fetch(API, { headers });
     if (r.status === 404) {
       sprints=[]; fileSHA=null; nextId=1;
-      setSyncState('ok','Nieuw bestand — sla op om te starten');
+      setSyncState(token ? 'ok' : 'ok', token ? 'Nieuw bestand — sla op om te starten' : 'Alleen lezen');
     } else if (!r.ok) {
-      throw new Error('fetch failed');
+      throw new Error('fetch failed ' + r.status);
     } else {
       const json = await r.json();
       fileSHA = json.sha;
       const d = JSON.parse(atob(json.content.replace(/\n/g,'')));
       sprints = d.sprints || [];
       nextId  = d.nextId  || (sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1);
-      // Migrate old records without sessie field
       sprints.forEach(s => { if (!s.sessie) s.sessie = '1'; });
-      setSyncState('ok','Gesynchroniseerd');
+      setSyncState('ok', token ? 'Gesynchroniseerd' : 'Alleen lezen');
     }
-  } catch {
+  } catch(e) {
     setSyncState('err','Laden mislukt');
     const local = localStorage.getItem('ag_li_v4');
     if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; sprints.forEach(s=>{if(!s.sessie)s.sessie='1';}); } catch{} }
   }
   document.getElementById('loadOverlay').style.display='none';
+  setEditMode(!!getToken());
   syncSlider(); syncWeekFilter(); renderAll();
+}
+
+function setEditMode(canEdit) {
+  // Toon/verberg alle bewerkingselementen op basis van token aanwezigheid
+  const editEls = document.querySelectorAll('.edit-only');
+  editEls.forEach(el => el.style.display = canEdit ? '' : 'none');
+  // Invoervelden in tabel read-only maken
+  document.querySelectorAll('td input[type=number]').forEach(inp => {
+    inp.disabled = !canEdit;
+    inp.style.background = canEdit ? 'var(--ag-bg)' : 'transparent';
+    inp.style.border = canEdit ? '' : 'none';
+    inp.style.color = canEdit ? 'var(--ag-dark)' : 'var(--ag-muted)';
+  });
 }
 
 async function saveToGitHub() {
@@ -591,7 +605,7 @@ function renderTable() {
         <input type="number" value="${s.positief}" min="0" title="Positieve reacties" onchange="updField(${s.id},'positief',this.value)">
       </td>
       <td style="font-size:11px;color:var(--ag-muted);">${s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'-'}</td>
-      <td><button class="del-btn" onclick="deleteSprint(${s.id})">✕</button></td>`;
+      <td><button class="del-btn edit-only" onclick="deleteSprint(${s.id})">✕</button></td>`;
     body.appendChild(tr);
   });
 }
@@ -778,7 +792,7 @@ function spawnPodiumConfetti(wrap) {
   }
 }
 
-function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium(); }
+function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium();setEditMode(!!getToken()); }
 
 function exportCSV() {
   const fs=filtered(), rows=[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Respons%']];
