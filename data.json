@@ -76,7 +76,18 @@
       "verstuurd": 28,
       "reacties": 2,
       "positief": 1
+    },
+    {
+      "id": 12,
+      "week": "Week 1",
+      "sessie": "3",
+      "recruiter": "Beaudine",
+      "niveau": "Junior",
+      "regio": "Zuid",
+      "verstuurd": 44,
+      "reacties": 1,
+      "positief": 0
     }
   ],
-  "nextId": 12
+  "nextId": 13
 }
