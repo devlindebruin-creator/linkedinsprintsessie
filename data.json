@@ -98,7 +98,18 @@
       "verstuurd": 29,
       "reacties": 6,
       "positief": 0
+    },
+    {
+      "id": 14,
+      "week": "Week 2",
+      "sessie": "1",
+      "recruiter": "Patrick",
+      "niveau": "Junior",
+      "regio": "Noord",
+      "verstuurd": 16,
+      "reacties": 0,
+      "positief": 0
     }
   ],
-  "nextId": 14
+  "nextId": 15
 }
