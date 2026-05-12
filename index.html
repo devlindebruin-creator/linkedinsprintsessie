@@ -312,7 +312,7 @@
       <table>
         <thead>
           <tr>
-            <th>Week</th><th>Sessie</th><th>Recruiter</th><th>Niveau</th><th>Regio</th><th>Verstuurd</th><th>React. / Pos.</th><th>%</th><th></th>
+            <th>Week</th><th>Sessie</th><th>Recruiter</th><th>Niveau</th><th>Regio</th><th>Verstuurd</th><th>React.</th><th>Pos.</th><th>Neut.</th><th>%</th><th></th>
           </tr>
         </thead>
         <tbody id="sprintBody"></tbody>
@@ -428,13 +428,13 @@ async function loadFromGitHub() {
       const d = JSON.parse(atob(json.content.replace(/\n/g,'')));
       sprints = d.sprints || [];
       nextId  = d.nextId  || (sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1);
-      sprints.forEach(s => { if (!s.sessie) s.sessie = '1'; });
+      sprints.forEach(s => { if (!s.sessie) s.sessie = '1'; if (s.neutraal === undefined) s.neutraal = 0; });
       setSyncState('ok', token ? 'Gesynchroniseerd' : 'Alleen lezen');
     }
   } catch(e) {
     setSyncState('err','Laden mislukt');
     const local = localStorage.getItem('ag_li_v4');
-    if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; sprints.forEach(s=>{if(!s.sessie)s.sessie='1';}); } catch{} }
+    if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; sprints.forEach(s=>{if(!s.sessie)s.sessie='1'; if(s.neutraal===undefined)s.neutraal=0;}); } catch{} }
   }
   document.getElementById('loadOverlay').style.display='none';
   setEditMode(!!getToken());
@@ -545,7 +545,7 @@ function addSprint() {
   const regio    = document.getElementById('f-regio').value;
   const verstuurd= parseInt(document.getElementById('f-verstuurd').value)||0;
   const reacties = parseInt(document.getElementById('f-reacties').value)||0;
-  sprints.push({id:nextId++,week,sessie,recruiter,niveau,regio,verstuurd,reacties,positief:0});
+  sprints.push({id:nextId++,week,sessie,recruiter,niveau,regio,verstuurd,reacties,positief:0,neutraal:0});
   syncSlider(); syncWeekFilter(); renderAll();
   document.getElementById('f-verstuurd').value='';
   document.getElementById('f-reacties').value='';
@@ -561,8 +561,12 @@ function deleteSprint(id) {
 function updField(id,field,val) {
   const s=sprints.find(s=>s.id===id); if(!s) return;
   s[field]=parseInt(val)||0;
-  if(s.positief>s.reacties) s.positief=s.reacties;
   if(s.reacties>s.verstuurd) s.reacties=s.verstuurd;
+  // Positief + Neutraal mag niet meer dan Reacties zijn
+  if(s.positief+s.neutraal>s.reacties) {
+    if(field==='positief') s.neutraal=Math.max(0,s.reacties-s.positief);
+    else s.positief=Math.max(0,s.reacties-s.neutraal);
+  }
   renderKPIs(); renderReactie(); scheduleSave();
 }
 
@@ -588,7 +592,7 @@ function renderKPIs() {
 
 function renderTable() {
   const fs=filtered(), body=document.getElementById('sprintBody');
-  if(!fs.length){ body.innerHTML='<tr><td colspan="9" class="empty-row">Geen sprint-sessies — voeg er een toe of pas de filters aan.</td></tr>'; return; }
+  if(!fs.length){ body.innerHTML='<tr><td colspan="11" class="empty-row">Geen sprint-sessies — voeg er een toe of pas de filters aan.</td></tr>'; return; }
   body.innerHTML='';
   fs.forEach(s=>{
     const tr=document.createElement('tr');
@@ -599,11 +603,9 @@ function renderTable() {
       <td><span class="tag ${NIVEAU_TAG[s.niveau]||'tn-medior'}">${s.niveau}</span></td>
       <td><span class="tag ${REGIO_TAG[s.regio]||'tr-midden'}">${s.regio}</span></td>
       <td><strong>${s.verstuurd}</strong></td>
-      <td style="white-space:nowrap;">
-        <input type="number" value="${s.reacties}" min="0" title="Totaal reacties" onchange="updField(${s.id},'reacties',this.value)">
-        <span style="font-size:10px;color:var(--ag-muted);margin:0 3px;">/</span>
-        <input type="number" value="${s.positief}" min="0" title="Positieve reacties" onchange="updField(${s.id},'positief',this.value)">
-      </td>
+      <td><input type="number" value="${s.reacties}" min="0" title="Totaal reacties" onchange="updField(${s.id},'reacties',this.value)"></td>
+      <td><input type="number" value="${s.positief}" min="0" title="Positieve reacties" onchange="updField(${s.id},'positief',this.value)" style="border-color:rgba(67,176,140,0.4);"></td>
+      <td><input type="number" value="${s.neutraal||0}" min="0" title="Neutrale reacties" onchange="updField(${s.id},'neutraal',this.value)" style="border-color:rgba(158,212,216,0.5);"></td>
       <td style="font-size:11px;color:var(--ag-muted);">${s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'-'}</td>
       <td><button class="del-btn edit-only" onclick="deleteSprint(${s.id})">✕</button></td>`;
     body.appendChild(tr);
@@ -678,12 +680,17 @@ function renderRegioBars() {
 
 function renderReactie() {
   const fs=filtered();
-  const sent=fs.reduce((a,s)=>a+s.verstuurd,0), react=fs.reduce((a,s)=>a+s.reacties,0), pos=fs.reduce((a,s)=>a+s.positief,0);
+  const sent=fs.reduce((a,s)=>a+s.verstuurd,0);
+  const react=fs.reduce((a,s)=>a+s.reacties,0);
+  const pos=fs.reduce((a,s)=>a+s.positief,0);
+  const neut=fs.reduce((a,s)=>a+(s.neutraal||0),0);
+  const neg=Math.max(0, react-pos-neut);
   const items=[
-    {label:'Geen reactie',      count:sent-react, bg:'rgba(246,198,198,0.35)',border:'#F6C6C6',            color:'#a05050'},
-    {label:'Reactie (totaal)',  count:react,      bg:'rgba(158,212,216,0.3)', border:'#9ED4D8',            color:'#1a6e7a'},
-    {label:'Positief',         count:pos,        bg:'rgba(67,176,140,0.2)',  border:'#43B08C',            color:'#007059'},
-    {label:'Neutraal/Negatief',count:react-pos,  bg:'rgba(17,54,66,0.07)',   border:'rgba(17,54,66,0.25)',color:'#8a9fa5'},
+    {label:'Geen reactie', count:sent-react, bg:'rgba(246,198,198,0.35)', border:'#F6C6C6',             color:'#a05050'},
+    {label:'Reactie (totaal)', count:react,  bg:'rgba(158,212,216,0.3)',  border:'#9ED4D8',             color:'#1a6e7a'},
+    {label:'Positief',    count:pos,         bg:'rgba(67,176,140,0.2)',   border:'#43B08C',             color:'#007059'},
+    {label:'Neutraal',    count:neut,        bg:'rgba(158,212,216,0.15)', border:'rgba(158,212,216,0.6)',color:'#1a6e7a'},
+    {label:'Negatief',    count:neg,         bg:'rgba(246,198,198,0.2)',  border:'rgba(246,198,198,0.8)',color:'#a05050'},
   ];
   document.getElementById('reactieList').innerHTML=items.map(it=>{
     const pct=sent>0?Math.round(it.count/sent*100):0;
@@ -795,8 +802,8 @@ function spawnPodiumConfetti(wrap) {
 function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium();setEditMode(!!getToken()); }
 
 function exportCSV() {
-  const fs=filtered(), rows=[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Respons%']];
-  fs.forEach(s=>rows.push([s.week,'S'+(s.sessie||1),s.recruiter,s.niveau,s.regio,s.verstuurd,s.reacties,s.positief,s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'0%']));
+  const fs=filtered(), rows=[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Neutraal','Negatief','Respons%']];
+  fs.forEach(s=>{const neg=Math.max(0,s.reacties-s.positief-(s.neutraal||0));rows.push([s.week,'S'+(s.sessie||1),s.recruiter,s.niveau,s.regio,s.verstuurd,s.reacties,s.positief,(s.neutraal||0),neg,s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'0%']);});
   const a=document.createElement('a');
   a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(rows.map(r=>r.join(',')).join('\n'));
   a.download='agium_linkedin_2026.csv'; a.click();
@@ -878,8 +885,8 @@ function exportPDF() {
 
   doc.autoTable({
     startY:y,
-    head:[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','%']],
-    body:fs.map(s=>[s.week,'S'+(s.sessie||1),s.recruiter,s.niveau,s.regio,s.verstuurd,s.reacties,s.positief,s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'-']),
+    body:fs.map(s=>{const neg=Math.max(0,s.reacties-s.positief-(s.neutraal||0));return[s.week,'S'+(s.sessie||1),s.recruiter,s.niveau,s.regio,s.verstuurd,s.reacties,s.positief,(s.neutraal||0),neg,s.verstuurd>0?Math.round(s.reacties/s.verstuurd*100)+'%':'-'];}),
+    head:[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','React.','Pos.','Neut.','Neg.','%']],
     styles:{fontSize:8,cellPadding:2.5,textColor:C_DARK,font:'helvetica'},
     headStyles:{fillColor:C_DARK,textColor:[255,255,255],fontStyle:'bold',fontSize:7.5},
     alternateRowStyles:{fillColor:C_BG},
@@ -965,11 +972,14 @@ function exportPDF() {
   const rxX=ML+colW+6;
   doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(...C_DARK);
   doc.text('Reacties overzicht',rxX,y);
+  const neut=fs.reduce((a,s)=>a+(s.neutraal||0),0);
+  const neg=Math.max(0,react-pos-neut);
   const rItems=[
-    {label:'Geen reactie',      count:sent-react, color:[246,198,198]},
-    {label:'Reactie (totaal)',  count:react,      color:[158,212,216]},
-    {label:'Positief',         count:pos,        color:[67,176,140]},
-    {label:'Neutraal/Negatief',count:react-pos,  color:[180,190,195]},
+    {label:'Geen reactie',     count:sent-react, color:[246,198,198]},
+    {label:'Reactie (totaal)', count:react,      color:[158,212,216]},
+    {label:'Positief',        count:pos,        color:[67,176,140]},
+    {label:'Neutraal',        count:neut,       color:[158,212,216]},
+    {label:'Negatief',        count:neg,        color:[246,198,198]},
   ];
   let iy=y+5;
   rItems.forEach(it=>{
