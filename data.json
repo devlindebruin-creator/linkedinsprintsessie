@@ -9,7 +9,8 @@
       "verstuurd": 40,
       "reacties": 4,
       "positief": 1,
-      "sessie": "1"
+      "sessie": "1",
+      "neutraal": 0
     },
     {
       "id": 5,
@@ -18,9 +19,10 @@
       "niveau": "Junior",
       "regio": "Noord",
       "verstuurd": 18,
-      "reacties": 3,
+      "reacties": 5,
       "positief": 0,
-      "sessie": "1"
+      "sessie": "1",
+      "neutraal": 0
     },
     {
       "id": 6,
@@ -31,7 +33,8 @@
       "verstuurd": 30,
       "reacties": 3,
       "positief": 1,
-      "sessie": "1"
+      "sessie": "1",
+      "neutraal": 0
     },
     {
       "id": 7,
@@ -42,7 +45,8 @@
       "regio": "Midden",
       "verstuurd": 44,
       "reacties": 4,
-      "positief": 0
+      "positief": 0,
+      "neutraal": 0
     },
     {
       "id": 9,
@@ -53,7 +57,8 @@
       "regio": "Noord",
       "verstuurd": 52,
       "reacties": 1,
-      "positief": 0
+      "positief": 0,
+      "neutraal": 0
     },
     {
       "id": 10,
@@ -64,7 +69,8 @@
       "regio": "Noord",
       "verstuurd": 29,
       "reacties": 8,
-      "positief": 2
+      "positief": 2,
+      "neutraal": 0
     },
     {
       "id": 11,
@@ -75,7 +81,8 @@
       "regio": "Noord",
       "verstuurd": 28,
       "reacties": 5,
-      "positief": 3
+      "positief": 3,
+      "neutraal": 0
     },
     {
       "id": 12,
@@ -86,7 +93,8 @@
       "regio": "Zuid",
       "verstuurd": 44,
       "reacties": 1,
-      "positief": 1
+      "positief": 1,
+      "neutraal": 0
     },
     {
       "id": 13,
@@ -97,7 +105,8 @@
       "regio": "Midden",
       "verstuurd": 29,
       "reacties": 6,
-      "positief": 0
+      "positief": 0,
+      "neutraal": 0
     },
     {
       "id": 14,
@@ -108,7 +117,8 @@
       "regio": "Noord",
       "verstuurd": 16,
       "reacties": 0,
-      "positief": 0
+      "positief": 0,
+      "neutraal": 0
     },
     {
       "id": 15,
@@ -119,7 +129,8 @@
       "regio": "Midden",
       "verstuurd": 6,
       "reacties": 0,
-      "positief": 0
+      "positief": 0,
+      "neutraal": 0
     },
     {
       "id": 16,
@@ -130,7 +141,8 @@
       "regio": "Zuid",
       "verstuurd": 27,
       "reacties": 7,
-      "positief": 1
+      "positief": 1,
+      "neutraal": 0
     }
   ],
   "nextId": 17
