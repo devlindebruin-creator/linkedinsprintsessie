@@ -155,7 +155,19 @@
       "reacties": 4,
       "positief": 2,
       "neutraal": 1
+    },
+    {
+      "id": 18,
+      "week": "Week 2",
+      "sessie": "2",
+      "recruiter": "Patrick",
+      "niveau": "Junior",
+      "regio": "Midden",
+      "verstuurd": 16,
+      "reacties": 0,
+      "positief": 0,
+      "neutraal": 0
     }
   ],
-  "nextId": 18
+  "nextId": 19
 }
