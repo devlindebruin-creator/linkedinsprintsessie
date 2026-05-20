@@ -191,7 +191,19 @@
       "reacties": 2,
       "positief": 0,
       "neutraal": 0
+    },
+    {
+      "id": 21,
+      "week": "Week 3",
+      "sessie": "1",
+      "recruiter": "Beaudine",
+      "niveau": "Medior",
+      "regio": "Zuid",
+      "verstuurd": 5,
+      "reacties": 0,
+      "positief": 0,
+      "neutraal": 0
     }
   ],
-  "nextId": 21
+  "nextId": 22
 }
