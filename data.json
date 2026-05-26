@@ -287,7 +287,19 @@
       "reacties": 0,
       "positief": 0,
       "neutraal": 0
+    },
+    {
+      "id": 32,
+      "week": "Week 3",
+      "sessie": "3",
+      "recruiter": "Devlin",
+      "niveau": "Medior",
+      "regio": "Midden",
+      "verstuurd": 10,
+      "reacties": 0,
+      "positief": 0,
+      "neutraal": 0
     }
   ],
-  "nextId": 32
+  "nextId": 33
 }
