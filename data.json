@@ -347,7 +347,19 @@
       "reacties": 0,
       "positief": 0,
       "neutraal": 0
+    },
+    {
+      "id": 37,
+      "week": "Week 4",
+      "sessie": "2",
+      "recruiter": "Patrick",
+      "niveau": "Junior",
+      "regio": "Zuid",
+      "verstuurd": 10,
+      "reacties": 0,
+      "positief": 0,
+      "neutraal": 0
     }
   ],
-  "nextId": 37
+  "nextId": 38
 }
