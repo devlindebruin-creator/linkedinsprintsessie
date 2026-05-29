@@ -335,7 +335,19 @@
       "reacties": 2,
       "positief": 0,
       "neutraal": 0
+    },
+    {
+      "id": 36,
+      "week": "Week 4",
+      "sessie": "2",
+      "recruiter": "Beaudine",
+      "niveau": "Junior",
+      "regio": "Midden",
+      "verstuurd": 10,
+      "reacties": 0,
+      "positief": 0,
+      "neutraal": 0
     }
   ],
-  "nextId": 36
+  "nextId": 37
 }
