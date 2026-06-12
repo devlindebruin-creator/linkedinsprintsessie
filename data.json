@@ -503,7 +503,19 @@
       "reacties": 0,
       "positief": 0,
       "neutraal": 0
+    },
+    {
+      "id": 50,
+      "week": "Week 6",
+      "sessie": "3",
+      "recruiter": "Beaudine",
+      "niveau": "Junior",
+      "regio": "Zuid",
+      "verstuurd": 26,
+      "reacties": 0,
+      "positief": 0,
+      "neutraal": 0
     }
   ],
-  "nextId": 50
+  "nextId": 51
 }
