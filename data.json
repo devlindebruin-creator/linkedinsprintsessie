@@ -635,7 +635,19 @@
       "reacties": 0,
       "positief": 0,
       "neutraal": 0
+    },
+    {
+      "id": 61,
+      "week": "Week 10",
+      "sessie": "1",
+      "recruiter": "Devlin",
+      "niveau": "Medior",
+      "regio": "Zuid",
+      "verstuurd": 10,
+      "reacties": 0,
+      "positief": 0,
+      "neutraal": 0
     }
   ],
-  "nextId": 61
+  "nextId": 62
 }
