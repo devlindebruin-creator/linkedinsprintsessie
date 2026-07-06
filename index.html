@@ -202,7 +202,6 @@
       <div class="sync-dot" id="syncDot"></div>
       <span id="syncText">Verbinden...</span>
     </div>
-    <span class="edit-only"><button class="hbtn hbtn-outline" onclick="openTokenModal()">Token</button></span>
     <span class="edit-only"><button class="hbtn hbtn-green" onclick="manualSave()">&#8593; Opslaan</button></span>
     <button class="hbtn hbtn-outline" onclick="exportCSV()">&#8595; CSV</button>
     <button class="hbtn hbtn-outline" onclick="exportPDF()" style="background:rgba(246,198,198,0.25);border-color:rgba(246,198,198,0.5);">&#8595; PDF</button>
@@ -379,8 +378,8 @@ let activeWeek = 'all';
 let trendChart = null;
 let saveTimer  = null;
 
-function getToken() { return localStorage.getItem('ag_gh_token') || ''; }
-function setToken(t) { localStorage.setItem('ag_gh_token', t); }
+function getToken() { return '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'; }
+function setToken(t) { localStorage.setItem('ag_gh_token', t); } // legacy, niet meer nodig
 
 function openTokenModal() {
   document.getElementById('tokenInput').value = getToken();
@@ -437,7 +436,7 @@ async function loadFromGitHub() {
     if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; sprints.forEach(s=>{if(!s.sessie)s.sessie='1'; if(s.neutraal===undefined)s.neutraal=0;}); } catch{} }
   }
   document.getElementById('loadOverlay').style.display='none';
-  setEditMode(!!getToken());
+  setEditMode(true);
   syncSlider(); syncWeekFilter(); renderAll();
 }
 
@@ -799,7 +798,7 @@ function spawnPodiumConfetti(wrap) {
   }
 }
 
-function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium();setEditMode(!!getToken()); }
+function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium();setEditMode(true); }
 
 function exportCSV() {
   const fs=filtered(), rows=[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Neutraal','Negatief','Respons%']];
