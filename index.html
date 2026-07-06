@@ -378,7 +378,7 @@ let activeWeek = 'all';
 let trendChart = null;
 let saveTimer  = null;
 
-function getToken() { return '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'; }
+function getToken() { return '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'; }
 function setToken(t) { localStorage.setItem('ag_gh_token', t); } // legacy, niet meer nodig
 
 function openTokenModal() {
@@ -1006,7 +1006,6 @@ function exportPDF() {
   doc.save(fname+'.pdf');
 }
 
-  
 loadFromGitHub();
 </script>
 </body>
