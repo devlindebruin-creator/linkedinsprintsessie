@@ -202,6 +202,7 @@
       <div class="sync-dot" id="syncDot"></div>
       <span id="syncText">Verbinden...</span>
     </div>
+    <span class="edit-only"><button class="hbtn hbtn-outline" onclick="openTokenModal()" id="tokenBtn">&#128273; Token</button></span>
     <span class="edit-only"><button class="hbtn hbtn-green" onclick="manualSave()">&#8593; Opslaan</button></span>
     <button class="hbtn hbtn-outline" onclick="exportCSV()">&#8595; CSV</button>
     <button class="hbtn hbtn-outline" onclick="exportPDF()" style="background:rgba(246,198,198,0.25);border-color:rgba(246,198,198,0.5);">&#8595; PDF</button>
@@ -378,7 +379,7 @@ let activeWeek = 'all';
 let trendChart = null;
 let saveTimer  = null;
 
-function getToken() { return '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'; }
+function getToken() { return localStorage.getItem('ag_gh_token') || ''; }
 function setToken(t) { localStorage.setItem('ag_gh_token', t); } // legacy, niet meer nodig
 
 function openTokenModal() {
@@ -394,7 +395,7 @@ async function saveToken() {
   try {
     const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, { headers: authHeaders(t) });
     if (!r.ok) throw new Error();
-    setToken(t); closeTokenModal(); setEditMode(true); await loadFromGitHub();
+    setToken(t); closeTokenModal(); setEditMode(!!getToken()); await loadFromGitHub();
   } catch {
     document.getElementById('tokenErr').style.display = 'block';
     setSyncState('err','Token onjuist');
@@ -428,7 +429,11 @@ async function loadFromGitHub() {
       sprints = d.sprints || [];
       nextId  = d.nextId  || (sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1);
       sprints.forEach(s => { if (!s.sessie) s.sessie = '1'; if (s.neutraal === undefined) s.neutraal = 0; });
-      setSyncState('ok', token ? 'Gesynchroniseerd' : 'Alleen lezen');
+      setSyncState('ok', token ? 'Gesynchroniseerd' : 'Klik Token om in te loggen');
+      if (!token) {
+        document.getElementById('tokenBtn') && (document.getElementById('tokenBtn').style.background = '#F6C6C6');
+        document.getElementById('tokenBtn') && (document.getElementById('tokenBtn').style.color = '#113642');
+      }
     }
   } catch(e) {
     setSyncState('err','Laden mislukt');
@@ -436,7 +441,7 @@ async function loadFromGitHub() {
     if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; sprints.forEach(s=>{if(!s.sessie)s.sessie='1'; if(s.neutraal===undefined)s.neutraal=0;}); } catch{} }
   }
   document.getElementById('loadOverlay').style.display='none';
-  setEditMode(true);
+  setEditMode(!!getToken());
   syncSlider(); syncWeekFilter(); renderAll();
 }
 
@@ -798,7 +803,7 @@ function spawnPodiumConfetti(wrap) {
   }
 }
 
-function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium();setEditMode(true); }
+function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium();setEditMode(!!getToken()); }
 
 function exportCSV() {
   const fs=filtered(), rows=[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Neutraal','Negatief','Respons%']];
