@@ -683,7 +683,19 @@
       "reacties": 4,
       "positief": 0,
       "neutraal": 0
+    },
+    {
+      "id": 65,
+      "week": "Week 6",
+      "sessie": "2",
+      "recruiter": "Devlin",
+      "niveau": "Junior",
+      "regio": "Zuid",
+      "verstuurd": 11,
+      "reacties": 0,
+      "positief": 0,
+      "neutraal": 0
     }
   ],
-  "nextId": 65
+  "nextId": 66
 }
