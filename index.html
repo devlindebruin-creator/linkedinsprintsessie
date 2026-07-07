@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LinkedIn Sprint Dashboard — Agium</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
@@ -175,7 +176,7 @@
   <p>Dashboard laden...</p>
 </div>
 
-<div class="modal-bg" id="tokenModal" style="display:none;">
+<div class="modal-bg" id="tokenModal" style="display:none;pointer-events:none;opacity:0;">
   <div class="modal">
     <h2>GitHub koppelen</h2>
     <p>Voer je GitHub Personal Access Token in om data op te slaan in <strong>devlindebruin-creator/linkedinsprintsessie</strong>.<br>Token wordt alleen lokaal opgeslagen in je browser.</p>
@@ -202,8 +203,6 @@
       <div class="sync-dot" id="syncDot"></div>
       <span id="syncText">Verbinden...</span>
     </div>
-    <button class="hbtn hbtn-outline" onclick="openTokenModal()" id="tokenBtn">&#128273; Token</button>
-    <span class="edit-only"><button class="hbtn hbtn-green" onclick="manualSave()">&#8593; Opslaan</button></span>
     <button class="hbtn hbtn-outline" onclick="exportCSV()">&#8595; CSV</button>
     <button class="hbtn hbtn-outline" onclick="exportPDF()" style="background:rgba(246,198,198,0.25);border-color:rgba(246,198,198,0.5);">&#8595; PDF</button>
   </div>
@@ -357,10 +356,9 @@
 </div>
 
 <script>
-const OWNER = 'devlindebruin-creator';
-const REPO  = 'linkedinsprintsessie';
-const FILE  = 'data.json';
-const API   = `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`;
+const SUPABASE_URL = 'https://ezcmksvtkrpxuzkwlfgz.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_OA1jO9EHNJnxPShrHpHpRQ_n6FI6sjJ';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const RECRUITERS  = ['Beaudine','Patrick','Marc','Devlin'];
 const NIVEAUS     = ['Junior','Medior','Senior','Werkondernemer'];
@@ -372,113 +370,95 @@ const REGIO_COLS  = ['#1a6e7a','#007059','#a05050'];
 const REC_COLS    = ['#113642','#43B08C','#9ED4D8','#007059'];
 
 let sprints    = [];
-let fileSHA    = null;
 let nextId     = 1;
 let af         = { recruiter:'all', regio:'all', sessie:'all' };
 let activeWeek = 'all';
 let trendChart = null;
 let saveTimer  = null;
-
-function getToken() { return localStorage.getItem('ag_gh_token') || ''; }
-function setToken(t) { localStorage.setItem('ag_gh_token', t); } // legacy, niet meer nodig
-
-function openTokenModal() {
-  document.getElementById('tokenInput').value = getToken();
-  document.getElementById('tokenErr').style.display = 'none';
-  document.getElementById('tokenModal').style.display = 'flex';
-}
-function closeTokenModal() { document.getElementById('tokenModal').style.display = 'none'; }
-async function saveToken() {
-  const t = document.getElementById('tokenInput').value.trim();
-  if (!t) return;
-  setSyncState('syncing','Token testen...');
-  try {
-    const r = await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`, { headers: authHeaders(t) });
-    if (!r.ok) throw new Error();
-    setToken(t); closeTokenModal(); setEditMode(!!getToken()); await loadFromGitHub();
-  } catch {
-    document.getElementById('tokenErr').style.display = 'block';
-    setSyncState('err','Token onjuist');
-  }
-}
+let realtimeSub = null;
 
 function setSyncState(state, text) {
   document.getElementById('syncDot').className = 'sync-dot ' + state;
   document.getElementById('syncText').textContent = text;
 }
-function authHeaders(token) {
-  return { 'Authorization':'token '+token, 'Content-Type':'application/json', 'Accept':'application/vnd.github.v3+json' };
+
+function sbHeaders() {
+  return { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
 }
 
-async function loadFromGitHub() {
-  const token = getToken();
+async function loadFromSupabase() {
   setSyncState('syncing','Laden...');
   try {
-    // Altijd proberen te laden — public repo leest zonder token
-    const headers = token ? authHeaders(token) : { 'Accept': 'application/vnd.github.v3+json' };
-    const r = await fetch(API, { headers });
-    if (r.status === 404) {
-      sprints=[]; fileSHA=null; nextId=1;
-      setSyncState(token ? 'ok' : 'ok', token ? 'Nieuw bestand — sla op om te starten' : 'Alleen lezen');
-    } else if (!r.ok) {
-      throw new Error('fetch failed ' + r.status);
-    } else {
-      const json = await r.json();
-      fileSHA = json.sha;
-      const d = JSON.parse(atob(json.content.replace(/\n/g,'')));
-      sprints = d.sprints || [];
-      nextId  = d.nextId  || (sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1);
-      sprints.forEach(s => { if (!s.sessie) s.sessie = '1'; if (s.neutraal === undefined) s.neutraal = 0; });
-      setSyncState('ok', token ? 'Gesynchroniseerd' : 'Klik Token om in te loggen');
-      if (!token) {
-        document.getElementById('tokenBtn') && (document.getElementById('tokenBtn').style.background = '#F6C6C6');
-        document.getElementById('tokenBtn') && (document.getElementById('tokenBtn').style.color = '#113642');
+    const r = await fetch(SUPABASE_URL + '/rest/v1/sprints?select=*&order=id.asc', { headers: sbHeaders() });
+    if (!r.ok) throw new Error(await r.text());
+    const data = await r.json();
+    sprints = data.map(s => ({...s, sessie: String(s.sessie||'1'), neutraal: s.neutraal||0}));
+    nextId  = sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1;
+    setSyncState('ok','Gesynchroniseerd');
+    document.getElementById('loadOverlay').style.display='none';
+    syncSlider(); syncWeekFilter(); renderAll();
+    startRealtime();
+  } catch(e) {
+    setSyncState('err','Laden mislukt: '+e.message);
+    document.getElementById('loadOverlay').style.display='none';
+  }
+}
+
+function startRealtime() {
+  if (realtimeSub) realtimeSub.unsubscribe();
+  realtimeSub = sb.channel('sprints-realtime')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sprints' }, async (payload) => {
+      setSyncState('syncing','Update ontvangen...');
+      // Reload all data voor consistentie
+      const r = await fetch(SUPABASE_URL + '/rest/v1/sprints?select=*&order=id.asc', { headers: sbHeaders() });
+      if (r.ok) {
+        const data = await r.json();
+        sprints = data.map(s => ({...s, sessie: String(s.sessie||'1'), neutraal: s.neutraal||0}));
+        nextId  = sprints.length ? Math.max(...sprints.map(s=>s.id))+1 : 1;
+        syncSlider(); syncWeekFilter(); renderAll();
+        setSyncState('ok','Live bijgewerkt ' + new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}));
       }
-    }
-  } catch(e) {
-    setSyncState('err','Laden mislukt');
-    const local = localStorage.getItem('ag_li_v4');
-    if (local) { try { const d=JSON.parse(local); sprints=d.sprints||[]; nextId=d.nextId||1; sprints.forEach(s=>{if(!s.sessie)s.sessie='1'; if(s.neutraal===undefined)s.neutraal=0;}); } catch{} }
-  }
-  document.getElementById('loadOverlay').style.display='none';
-  setEditMode(!!getToken());
-  syncSlider(); syncWeekFilter(); renderAll();
+    })
+    .subscribe();
 }
 
-function setEditMode(canEdit) {
-  // Toon/verberg alle bewerkingselementen op basis van token aanwezigheid
-  const editEls = document.querySelectorAll('.edit-only');
-  editEls.forEach(el => el.style.display = canEdit ? '' : 'none');
-  // Invoervelden in tabel read-only maken
-  document.querySelectorAll('td input[type=number]').forEach(inp => {
-    inp.disabled = !canEdit;
-    inp.style.background = canEdit ? 'var(--ag-bg)' : 'transparent';
-    inp.style.border = canEdit ? '' : 'none';
-    inp.style.color = canEdit ? 'var(--ag-dark)' : 'var(--ag-muted)';
-  });
-}
-
-async function saveToGitHub() {
-  const token = getToken();
-  if (!token) { setSyncState('err','Geen token'); return; }
+async function saveRow(sprint) {
   setSyncState('syncing','Opslaan...');
-  const payload = { sprints, nextId };
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(payload, null, 2))));
-  const body = { message:'Dashboard update '+new Date().toISOString(), content };
-  if (fileSHA) body.sha = fileSHA;
   try {
-    const r = await fetch(API, { method:'PUT', headers:authHeaders(token), body:JSON.stringify(body) });
-    if (!r.ok) { const e=await r.json(); throw new Error(e.message); }
-    const j = await r.json();
-    fileSHA = j.content.sha;
-    localStorage.setItem('ag_li_v4', JSON.stringify(payload));
-    setSyncState('ok','Opgeslagen '+new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}));
-  } catch(e) {
-    setSyncState('err','Opslaan mislukt: '+e.message);
-  }
+    const r = await fetch(SUPABASE_URL + '/rest/v1/sprints', {
+      method: 'POST',
+      headers: {...sbHeaders(), 'Prefer': 'resolution=merge-duplicates,return=representation'},
+      body: JSON.stringify([sprint])
+    });
+    if (!r.ok) throw new Error(await r.text());
+    setSyncState('ok','Opgeslagen ' + new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}));
+  } catch(e) { setSyncState('err','Opslaan mislukt: '+e.message); }
 }
-function scheduleSave() { clearTimeout(saveTimer); saveTimer=setTimeout(saveToGitHub,1500); }
-function manualSave()   { clearTimeout(saveTimer); saveToGitHub(); }
+
+async function updateRow(id, fields) {
+  setSyncState('syncing','Opslaan...');
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/sprints?id=eq.' + id, {
+      method: 'PATCH',
+      headers: sbHeaders(),
+      body: JSON.stringify(fields)
+    });
+    if (!r.ok) throw new Error(await r.text());
+    setSyncState('ok','Opgeslagen ' + new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit'}));
+  } catch(e) { setSyncState('err','Opslaan mislukt: '+e.message); }
+}
+
+async function deleteRow(id) {
+  try {
+    const r = await fetch(SUPABASE_URL + '/rest/v1/sprints?id=eq.' + id, {
+      method: 'DELETE', headers: sbHeaders()
+    });
+    if (!r.ok) throw new Error(await r.text());
+  } catch(e) { setSyncState('err','Verwijderen mislukt: '+e.message); }
+}
+
+function scheduleSave() {} // niet meer nodig met Supabase
+function manualSave() { setSyncState('ok','Data staat live in Supabase'); }
 
 /* ── WEEKS ── */
 function sortWeeks(arr) { return arr.sort((a,b)=>parseInt(a.replace('Week ',''))-parseInt(b.replace('Week ',''))); }
@@ -549,7 +529,9 @@ function addSprint() {
   const regio    = document.getElementById('f-regio').value;
   const verstuurd= parseInt(document.getElementById('f-verstuurd').value)||0;
   const reacties = parseInt(document.getElementById('f-reacties').value)||0;
-  sprints.push({id:nextId++,week,sessie,recruiter,niveau,regio,verstuurd,reacties,positief:0,neutraal:0});
+  const newSprint = {id:nextId++,week,sessie,recruiter,niveau,regio,verstuurd,reacties,positief:0,neutraal:0};
+  sprints.push(newSprint);
+  saveRow(newSprint);
   syncSlider(); syncWeekFilter(); renderAll();
   document.getElementById('f-verstuurd').value='';
   document.getElementById('f-reacties').value='';
@@ -560,7 +542,8 @@ function addSprint() {
 function deleteSprint(id) {
   if(!confirm('Sprint verwijderen?')) return;
   sprints=sprints.filter(s=>s.id!==id);
-  syncSlider(); syncWeekFilter(); renderAll(); scheduleSave();
+  deleteRow(id);
+  syncSlider(); syncWeekFilter(); renderAll();
 }
 function updField(id,field,val) {
   const s=sprints.find(s=>s.id===id); if(!s) return;
@@ -571,7 +554,8 @@ function updField(id,field,val) {
     if(field==='positief') s.neutraal=Math.max(0,s.reacties-s.positief);
     else s.positief=Math.max(0,s.reacties-s.neutraal);
   }
-  renderKPIs(); renderReactie(); scheduleSave();
+  updateRow(id, {[field]: s[field]});
+  renderKPIs(); renderReactie();
 }
 
 /* ── RENDER ── */
@@ -803,7 +787,7 @@ function spawnPodiumConfetti(wrap) {
   }
 }
 
-function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium();setEditMode(!!getToken()); }
+function renderAll() { renderKPIs();renderTable();renderNiveauBars();renderRegioBars();renderReactie();renderRecruiterBars();renderTrend();renderPodium();setEditMode(true); }
 
 function exportCSV() {
   const fs=filtered(), rows=[['Week','Sessie','Recruiter','Niveau','Regio','Verstuurd','Reacties','Positief','Neutraal','Negatief','Respons%']];
@@ -1011,7 +995,7 @@ function exportPDF() {
   doc.save(fname+'.pdf');
 }
 
-loadFromGitHub();
+loadFromSupabase();
 </script>
 </body>
 </html>
