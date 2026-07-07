@@ -457,6 +457,9 @@ async function deleteRow(id) {
   } catch(e) { setSyncState('err','Verwijderen mislukt: '+e.message); }
 }
 
+function setEditMode(canEdit) {
+  document.querySelectorAll('.edit-only').forEach(el => el.style.display = canEdit ? '' : 'none');
+}
 function scheduleSave() {} // niet meer nodig met Supabase
 function manualSave() { setSyncState('ok','Data staat live in Supabase'); }
 
